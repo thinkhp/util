@@ -7,7 +7,7 @@ go 的工具包
 
 3.thinkLog:日志(DEBUG,WARN,ERROR三级别,输出至指定目录下)
 
-4.thinkShell:执行command,*.sh,*.bat
+4.thinkShell:执行command,\*.sh,\*.bat
 
 5.thinkTimer:创建定时器
 
