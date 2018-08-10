@@ -8,6 +8,7 @@ import (
 	"time"
 	"util/think"
 	"util/timeUtil"
+	"errors"
 )
 
 type JsonObject map[string]interface{}
@@ -27,49 +28,70 @@ func GetJsonObject(data []byte) JsonObject {
 }
 
 // 以下函数含有参数校验:若为nil,panic()
-func (jsonObject JsonObject) GetObject(key string) JsonObject {
+func (jsonObject JsonObject) GetObject(key string) (JsonObject, error) {
 	jsonObjectUnder, ok := jsonObject[key].(map[string]interface{})
 	if ok {
-		return jsonObjectUnder
+		return jsonObjectUnder, nil
 	} else {
-		return nil
+		return nil,errors.New("json:not get map[string]interface{} from " + key)
 	}
-
 }
 
-func (jsonObject JsonObject) GetBool(key string) bool {
-	return jsonObject[key].(bool)
+func (jsonObject JsonObject) GetBool(key string) (bool,error) {
+	flag, ok := jsonObject[key].(bool)
+	if ok {
+		return flag, nil
+	} else {
+		return false, errors.New("json:not get bool from " + key)
+	}
 }
 
-func (jsonObject JsonObject) GetString(key string) string {
+func (jsonObject JsonObject) GetString(key string) (string, error) {
 	str, ok := jsonObject[key].(string)
 	if ok {
-		return str
+		return str, nil
 	} else {
-		return ""
+		return "", errors.New("json:not get string from " + key)
 	}
 }
 
-func (jsonObject JsonObject) GetInt(key string) int {
-	return int(jsonObject[key].(float64))
+func (jsonObject JsonObject) GetInt(key string) (int, error) {
+	num, ok := jsonObject[key].(float64)
+	if ok {
+		return int(num), nil
+	} else {
+		return 0,errors.New("json:not get int from " + key)
+	}
 }
 
-func (jsonObject JsonObject) GetFloat64(key string) float64 {
-	return jsonObject[key].(float64)
+func (jsonObject JsonObject) GetFloat64(key string) (float64, error) {
+	num, ok := jsonObject[key].(float64)
+	if ok {
+		return num, nil
+	} else {
+		return 0.0,errors.New("json:not get float from " + key)
+	}
 }
 
-func (jsonObject JsonObject) GetTime(key string) time.Time {
-	datetime := jsonObject[key].(string)
-	return timeUtil.GetTimeFromString(datetime)
+func (jsonObject JsonObject) GetTime(key string) (time.Time, error) {
+	datetime, ok := jsonObject[key].(string)
+	if ok {
+		return timeUtil.GetTimeFromString(datetime), nil
+	} else {
+		return time.Time{}, errors.New("json:not get time.Time from " + key)
+	}
 }
 
-func (jsonObject JsonObject) GetList(key string) []JsonObject {
-	list := jsonObject[key].([]interface{})
+func (jsonObject JsonObject) GetList(key string) ([]JsonObject, error) {
+	list, ok := jsonObject[key].([]interface{})
+	if !ok {
+		return make([]JsonObject,0), errors.New("json:not get []interface{} from " + key)
+	}
 	var jsonObjectSlice = make([]JsonObject, 0, len(list))
 	for i := 0; i < len(list); i++ {
 		jsonObjectSlice = append(jsonObjectSlice, list[i].(map[string]interface{}))
 	}
-	return jsonObjectSlice
+	return jsonObjectSlice, nil
 }
 
 func (jsonObject JsonObject) GetStruct(ptr interface{}) {
@@ -88,13 +110,17 @@ func (jsonObject JsonObject) GetStruct(ptr interface{}) {
 		field := v.FieldByName(name)
 		switch field.Kind() {
 		case reflect.String:
-			field.SetString(jsonObject.GetString(jsonName))
+			str, _ := jsonObject.GetString(jsonName)
+			field.SetString(str)
 		case reflect.Int, reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64, reflect.Uint, reflect.Uint8, reflect.Uint16, reflect.Uint32, reflect.Uint64:
-			field.SetInt(int64(jsonObject.GetInt(jsonName)))
+			num, _ := jsonObject.GetInt(jsonName)
+			field.SetInt(int64(num))
 		case reflect.Float64, reflect.Float32:
-			field.SetFloat(jsonObject.GetFloat64(jsonName))
+			num, _ := jsonObject.GetFloat64(jsonName)
+			field.SetFloat(num)
 		case reflect.Bool:
-			field.SetBool(jsonObject.GetBool(jsonName))
+			flag, _ := jsonObject.GetBool(jsonName)
+			field.SetBool(flag)
 		default:
 			field.SetPointer(nil)
 		}
