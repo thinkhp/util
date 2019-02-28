@@ -19,6 +19,11 @@ func AddHttpFunc(url string, function func(http.ResponseWriter, *http.Request), 
 	}
 }
 
+// 注册静态文件服务器
+func AddFileServer(url string) {
+
+}
+
 //权限控制(函数权限,999所需权限最小,0需要超级管理员)
 //if requestMap[url].role < 0{
 //	think.GetResponseJson(w,false,"not page",404)
