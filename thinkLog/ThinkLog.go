@@ -69,36 +69,40 @@ func SetLogFileTask() {
 	<-settingOk
 }
 
+// 每天更改日志指向文件
 func setLogFileTask() {
 	defer func() {
 		if r := recover(); r != nil {
 			fmt.Println("[recover] 日志已恢复")
 		}
 	}()
-	setLogFile()
-	time.Sleep(time.Second)
-	now := time.Now()
-	next := now.AddDate(0, 0, 1)
+	duration := time.Hour * 24
+	setLogFile(duration)
+	next := time.Now().Add(duration)
 	next = time.Date(next.Year(), next.Month(), next.Day(), 0, 0, 0, 0, next.Location())
 	fmt.Println("util/thinkLog.setLogFile", "  nextTime:", next)
 	time.Sleep(next.Sub(time.Now()))
 }
 
-func setLogFile() {
+func setLogFile(duration time.Duration) {
 	var mu sync.Mutex
 	// 获取之前的日志文件的指针
-	var tempDebugLogFile *os.File = DebugLogFile
-	var tempWarnLogFile *os.File = WarnLogFile
-	var tempErrorLogFile *os.File = ErrorLogFile
-	// 日志的密度以天为单位
-	fileNameUnSuffix := time.Now().String()[:10]
-	// 日志密度以分钟为单位
-	//getTimeString := func() string{
-	//	now := time.Now()
-	//	return now.Format("20060102150405")
-	//}
-	//fileNameUnSuffix := getTimeString()
-	//nextTime := "* * * * * 0"
+	var olderDebugLogFile *os.File = DebugLogFile
+	var olderWarnLogFile *os.File = WarnLogFile
+	var olderErrorLogFile *os.File = ErrorLogFile
+
+	var fileNameUnSuffix string
+	now := time.Now()
+	switch duration {
+	case time.Hour * 24: // 日志的密度以天为单位
+		fileNameUnSuffix = GetTimeStringForFileName(now)[:10]
+	case time.Hour: // 日志的密度以小时为单位
+		fileNameUnSuffix = GetTimeStringForFileName(now)[:13]
+	case time.Minute: // 日志的密度以分钟为单位
+		fileNameUnSuffix = GetTimeStringForFileName(now)[:16]
+	case time.Second: // 日志的密度以秒为单位
+		fileNameUnSuffix = GetTimeStringForFileName(now)[:19]
+	}
 	if LogDir != "" {
 		logFile := func(level string) *os.File {
 			// 如果path指定了一个已经存在的目录，MkdirAll不做任何操作并返回nil。
@@ -126,9 +130,9 @@ func setLogFile() {
 		mu.Unlock()
 	}
 	if !DefaultSetting {
-		tempDebugLogFile.Close()
-		tempWarnLogFile.Close()
-		tempErrorLogFile.Close()
+		olderDebugLogFile.Close()
+		olderWarnLogFile.Close()
+		olderErrorLogFile.Close()
 	}
 	DefaultSetting = false
 }
@@ -142,4 +146,21 @@ func (t *thinkDebugLogger) PrintSQL(sqlString string, params []interface{}) {
 	}
 	thinkString.ReplaceLastRune(&printStr, 0)
 	t.Println(printStr)
+}
+
+// 请求信息,请求参数
+func (t *thinkDebugLogger) PrintParams(url, paramKind string, params ...string) {
+	log := "\n"
+	log += url + "\n"
+	log += "***************************** " + paramKind + " ****************************\n"
+	for i := 0; i < len(params); i++ {
+		log += params[i] + "\n"
+	}
+	log += "***************************** " + paramKind + " ****************************"
+	t.Println(log)
+}
+
+// 因为 import cycle not allowed(thinkLog, thinkTime)
+func GetTimeStringForFileName(now time.Time) string {
+	return now.Format("2006-01-02T15-04-05.999999999")
 }

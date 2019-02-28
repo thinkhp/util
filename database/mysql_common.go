@@ -17,34 +17,41 @@ var Idb *sql.DB
 var source string
 var CacheDatabase map[string]interface{}
 
-
 func SetConn(sourceName string) *sql.DB {
 	var err error
 	Idb, err = sql.Open("mysql", sourceName)
-	think.Check(err)
+	think.IsNil(err)
 
 	_, rows := SelectList(nil, "SHOW GLOBAL VARIABLES")
 	var waitTimeout string
-	var maxAllowedPacket string
+	// max_allowed_packet
 	for i := 0; i < len(rows); i++ {
-		if strings.Contains(rows[i][0], "wait_timeout") {
+		//fmt.Println(rows[i])
+		if strings.Compare(rows[i][0], "wait_timeout") == 0 {
 			waitTimeout = rows[i][1]
 			break
 		}
-		if strings.Contains(rows[i][0], "max_allowed_packet") {
-			maxAllowedPacket = rows[i][1]
-		}
 	}
 	//fmt.Println("waitTimeout",waitTimeout)
-	_ = maxAllowedPacket
 	timeout, err := strconv.Atoi(waitTimeout)
-	think.Check(err)
+	think.IsNil(err)
 	//fmt.Println("timeout",time.Duration(timeout) * time.Second)
 	// 设置连接的最长存活时间 = mysql.cnf.wait_timeout
 	//int(time.Second) = 1000000000
+	// 连接存活最长存活时间,(若idle为0,此项无意义)
 	Idb.SetConnMaxLifetime(time.Duration(timeout) * time.Second)
-	Idb.SetMaxOpenConns(5)
-	source = sourceName
+	// 最多打开的连接数
+	Idb.SetMaxOpenConns(20)
+	// 空闲连接
+	Idb.SetMaxIdleConns(0)
+	//source = sourceName
+
+	//go func() {
+	//	for true {
+	//		time.Sleep(time.Millisecond * 1000)
+	//		fmt.Println("database: ",Idb.Stats().OpenConnections)
+	//	}
+	//}()
 	return Idb
 }
 
@@ -53,7 +60,7 @@ func SetConn(sourceName string) *sql.DB {
 // transaction
 func BeginTrans() *sql.Tx {
 	tx, err := Idb.Begin()
-	think.Check(err)
+	think.IsNil(err)
 	return tx
 }
 

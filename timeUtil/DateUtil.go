@@ -20,6 +20,24 @@ const oneDayMS int64 = 24 * 60 * 60 * 1000
 // 一天的秒数
 const oneDay int64 = 24 * 60 * 60
 
+type FileName string
+
+func GetTimeStringForFileName(now time.Time) FileName {
+	return FileName(now.Format("20060102T150405"))
+}
+func (f FileName) TillDay() string {
+	return string(f)[:8]
+}
+func (f FileName) TillHour() string {
+	return string(f)[:11]
+}
+func (f FileName) TillMinute() string {
+	return string(f)[:13]
+}
+func (f FileName) TillSecond() string {
+	return string(f)[:15]
+}
+
 func GetDate(now time.Time, i int) time.Time {
 	now = now.AddDate(0, 0, i)
 	return time.Date(now.Year(), now.Month(), now.Day(), 0, 0, 0, 0, now.Location())
@@ -123,7 +141,7 @@ func GetTimeFromSqlString(date string) time.Time {
 	// 第一，当缺少时区信息时，Parse将时间解释为UTC时间，而ParseInLocation将返回值的Location设置为loc；
 	// 第二，当时间字符串提供了时区偏移量信息时，Parse会尝试去匹配本地时区，而ParseInLocation会去匹配loc
 	t, err := time.ParseInLocation("2006-01-02T15:04:05Z", date, loc)
-	think.Check(err)
+	think.IsNil(err)
 	return t
 }
 
@@ -140,7 +158,7 @@ func GetTimeFromString(date string) time.Time {
 	case 20:
 		t, err = time.ParseInLocation("2006-01-02T15:04:05Z", date, loc)
 	}
-	think.Check(err)
+	think.IsNil(err)
 
 	return t
 }

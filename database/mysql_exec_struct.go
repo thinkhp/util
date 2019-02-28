@@ -9,8 +9,11 @@ import (
 	"util/thinkString"
 )
 
-func UpdateStruct(tx *sql.Tx, tableName string, notNilMap map[string]string, primaryKeyName string, primaryKey int) int64 {
+// 文件描述:
+// 数据库 mysql 的增删改查
+// 根据参数创建完整的 SQL 语句, 并提交
 
+func UpdateStruct(tx *sql.Tx, tableName string, notNilMap map[string]string, primaryKeyName string, primaryKey int) int64 {
 	sqlString := "UPDATE " + tableName + " SET "
 	for k, v := range notNilMap {
 		sqlString += k + "=" + v + ","
@@ -29,9 +32,9 @@ func UpdateStruct(tx *sql.Tx, tableName string, notNilMap map[string]string, pri
 	} else {
 		result, err = tx.Exec(sqlString)
 	}
-	think.Check(err)
+	think.IsNil(err)
 	affect, err := result.RowsAffected()
-	think.Check(err)
+	think.IsNil(err)
 
 	return affect
 }
@@ -47,16 +50,17 @@ func DeleteStruct(tx *sql.Tx, tableName string, primaryKeyName string, primaryKe
 	} else {
 		result, err = tx.Exec(sqlString)
 	}
-	think.Check(err)
+	think.IsNil(err)
 	affect, err := result.RowsAffected()
-	think.Check(err)
+	think.IsNil(err)
 
 	return affect
 }
 
 // 存在唯一索引的插入,不会panic
+// INSERT IGNORE INTO table_name (col1,col2,col3...) VALUES (v1,v2,v3...),(v1,v2,v3...),(v1,v2,v3...)
 func InsertStructUnique(tx *sql.Tx, tableName string, notNilMap map[string]string) int64 {
-	sqlString := "INSERT INTO " + tableName + " ("
+	sqlString := "INSERT IGNORE INTO " + tableName + " ("
 	var value = " VALUES ("
 	for k, v := range notNilMap {
 		sqlString += k + ","
@@ -73,14 +77,9 @@ func InsertStructUnique(tx *sql.Tx, tableName string, notNilMap map[string]strin
 	} else {
 		result, err = tx.Exec(sqlString + value)
 	}
-	//think.Check(err)
-	if err != nil {
-		// 由于唯一索引,插入出错  |  错误number:1062
-		thinkLog.WarnLog.Println(err)
-		return 0
-	}
+	think.IsNil(err)
 	last, err := result.LastInsertId()
-	think.Check(err)
+	think.IsNil(err)
 
 	return last
 }
@@ -103,16 +102,16 @@ func InsertStruct(tx *sql.Tx, tableName string, notNilMap map[string]string) int
 	} else {
 		result, err = tx.Exec(sqlString + value)
 	}
-	think.Check(err)
+	think.IsNil(err)
 	last, err := result.LastInsertId()
-	think.Check(err)
+	think.IsNil(err)
 
 	return last
 }
 
 func InsertBatchStruct(tx *sql.Tx, tableName string, notNilMapList *[]map[string]string) int64 {
 	keyList := make([]string, 0)
-	sqlString := "INSERT INTO " + tableName + " ("
+	sqlString := "INSERT IGNORE INTO " + tableName + " ("
 	for k, _ := range (*notNilMapList)[0] {
 		sqlString += k + ","
 		keyList = append(keyList, k)
@@ -139,13 +138,15 @@ func InsertBatchStruct(tx *sql.Tx, tableName string, notNilMapList *[]map[string
 	} else {
 		result, err = tx.Exec(sqlString + value)
 	}
-	think.Check(err)
+	think.IsNil(err)
 	affect, err := result.RowsAffected()
-	think.Check(err)
+	think.IsNil(err)
 
 	return affect
 }
 
+// !!!重要提示:
+// *sql.Rows 未关闭
 func Select(tx *sql.Tx, sqlString string, args ...interface{}) *sql.Rows {
 	thinkLog.DebugLog.PrintSQL(sqlString, args)
 	var rows *sql.Rows
@@ -155,7 +156,7 @@ func Select(tx *sql.Tx, sqlString string, args ...interface{}) *sql.Rows {
 	} else {
 		rows, err = tx.Query(sqlString, args...)
 	}
-	think.Check(err)
+	think.IsNil(err)
 
 	return rows
 }
@@ -178,7 +179,7 @@ func SelectStruct(tx *sql.Tx, ptr interface{}, sqlString string, args ...interfa
 	} else {
 		rows, err = tx.Query(sqlString, args...)
 	}
-	think.Check(err)
+	think.IsNil(err)
 	defer rows.Close()
 
 	length := 0

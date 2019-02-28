@@ -6,6 +6,7 @@ import (
 	"reflect"
 	"regexp"
 	"strconv"
+	"strings"
 	"time"
 )
 
@@ -38,6 +39,11 @@ func UUID(lens int) string {
 	return string(result)
 }
 
+func FirstRuneLarge(s string) string {
+	s = string(s[0]+'A'-'a') + s[1:]
+	return s
+}
+
 // 替换字符串的最后一位字符
 func ReplaceLastRune(s *string, replace rune) {
 	charBuff := []rune(*s)
@@ -67,4 +73,25 @@ func AsString(src interface{}) string {
 		return strconv.FormatBool(rv.Bool())
 	}
 	return fmt.Sprintf("%v", src)
+}
+
+// 首字母小写,驼峰转换
+func underlineToUpperCaseWithout(underline string) string {
+	underlineArray := strings.Split(underline, "_")
+	var upperStr string = ""
+	for y := 0; y < len(underlineArray); y++ {
+		if y == 0 {
+			upperStr += string(underlineArray[0])
+			continue
+		}
+		temp := []rune(underlineArray[y])
+		for i := 0; i < len(temp); i++ {
+			if i == 0 {
+				temp[i] -= 32
+			}
+		}
+		upperStr += string(temp)
+	}
+
+	return upperStr
 }

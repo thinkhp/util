@@ -4,19 +4,9 @@ import (
 	"bytes"
 	"crypto/aes"
 	"crypto/cipher"
-	"crypto/md5"
 	"encoding/base64"
-	"encoding/hex"
-	"kj/util"
 	"util/think"
 )
-
-func GetMD5(str string) string {
-	md5Ctx := md5.New()
-	md5Ctx.Write([]byte(str))
-	cipherStr := md5Ctx.Sum(nil)
-	return hex.EncodeToString(cipherStr)
-}
 
 // 微信:
 // 接口如果涉及敏感数据（如wx.getUserInfo当中的 openId 和unionId ），接口的明文内容将不包含这些敏感数据。
@@ -35,7 +25,7 @@ func AESDecrypt(encryptedData, key, iv string) []byte {
 	// 1.密文,密钥,初始向量 转为 []byte
 	decode := func(str string) []byte {
 		bytes, err := base64.StdEncoding.DecodeString(str)
-		think.Check(err)
+		think.IsNil(err)
 		return bytes
 	}
 	dataByte := decode(encryptedData)
@@ -48,7 +38,7 @@ func AESDecrypt(encryptedData, key, iv string) []byte {
 	}
 	// 3.初始化
 	block, err := aes.NewCipher(keyByte)
-	util.IsNil(err)
+	think.IsNil(err)
 	blockMode := cipher.NewCBCDecrypter(block, ivByte)
 	// 4.解密
 	origData := make([]byte, len(dataByte))
@@ -63,7 +53,7 @@ func AESDecrypt(encryptedData, key, iv string) []byte {
 func AESEncrypt(data, key, iv []byte) []byte {
 	// 初始化
 	block, err := aes.NewCipher(key)
-	think.Check(err)
+	think.IsNil(err)
 	mode := cipher.NewCBCEncrypter(block, iv)
 	blockSize := block.BlockSize()
 	// 数据采用PKCS#5填充

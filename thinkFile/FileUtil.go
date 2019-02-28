@@ -5,7 +5,7 @@ import (
 	"path/filepath"
 	"strings"
 	"util/think"
-		)
+)
 
 //权限说明：
 //O_RDONLY int = syscall.O_RDONLY // 只读
@@ -17,6 +17,7 @@ import (
 //O_SYNC int = syscall.O_SYNC // 同步方式打开，没有缓存，这样写入内容直接写入硬盘，系统掉电文件内容有一定保证
 //O_TRUNC int = syscall.O_TRUNC // 打开并清空文件
 
+// fileMode说明
 // The defined file mode bits are the most significant bits of the FileMode.
 // The nine least-significant bits are the standard Unix rwxrwxrwx permissions.
 // The values of these bits should be considered part of the public API and
@@ -43,6 +44,27 @@ import (
 //
 //	ModePerm FileMode = 0777 // Unix permission bits
 //)
+//chmod [-R] xyz filename|dirname  -R:表示递归修改
+//
+//Linux文件的基本权限有9个,
+// 分别是owner,group,others三种身份各自的read,write,execute权限,3个一组.
+// owner/group/others 即 拥有者/群组/其他
+// read/write/execute 即 可读/可写/可执行
+// 可以用数字代表各个权限:
+// x:1
+// w:2
+// r:4
+//利用2进制表示,1代表有此权限,0表示没有此权限:
+//---: 000 => 0
+//--x: 001 => 1
+//-w-: 010 => 2
+//-wx: 011 => 3
+//r--: 100 => 4
+//r-x: 101 => 5
+//rw-: 110 => 6
+//rwx: 111 => 7
+//
+//因此:若将文件的权限修改为rwxrwx---,则对应的数字为 770
 func OpenFile(filePath string, fileName string, flag int) *os.File {
 	CreatePath(filePath)
 	fileFullName := filePath + fileName
@@ -51,9 +73,17 @@ func OpenFile(filePath string, fileName string, flag int) *os.File {
 	// 如果不存在，则创建
 	// 在文件末尾追加
 	file, err := os.OpenFile(fileFullName, flag, 0766)
-	think.Check(err)
+	think.IsNil(err)
 	// 本次打开的文件如果close,log日志无法写入
 	// file.Close()
+	return file
+}
+
+
+func ReadFile(fileFullName string) *os.File {
+	file, err := os.OpenFile(fileFullName, os.O_RDONLY, 0766)
+	think.IsNil(err)
+
 	return file
 }
 
@@ -62,11 +92,11 @@ func CreatePath(path string) {
 	_, err := os.Stat(path)
 	if err != nil {
 		if !os.IsNotExist(err) {
-			think.Check(err)
+			think.IsNil(err)
 		} else {
 			// 创建文件夹
 			err := os.MkdirAll(path, os.ModePerm)
-			think.Check(err)
+			think.IsNil(err)
 		}
 	}
 }
@@ -76,8 +106,7 @@ func CreatePath(path string) {
 func GetAbsPathWith(basePath string) string {
 	basePath = strings.Replace(basePath, "/", string(os.PathSeparator), -1)
 	path, err := filepath.Abs(basePath)
-	think.Check(err)
-
+	think.IsNil(err)
 	if strings.HasSuffix(path, string(os.PathSeparator)) {
 		return path
 	} else {
@@ -86,7 +115,7 @@ func GetAbsPathWith(basePath string) string {
 }
 
 // 遍历当前目录下的文件
-func ListFile(path string,suffix string) []string{
+func ListFile(path string, suffix string) []string {
 	allFile := make([]string, 0)
 	filePath := GetAbsPathWith(path)
 	// 遍历filePath下的所有文件以及目录,ls .sql 文件

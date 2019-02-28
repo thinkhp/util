@@ -4,10 +4,10 @@ import (
 	"time"
 )
 
-func GetNextSunday(now time.Time) time.Time {
+func GetNextWeekday(now time.Time, weekday time.Weekday) time.Time {
 	var next time.Time
 	// 判断是否为星期日
-	if now.Weekday() == 0 {
+	if now.Weekday() == weekday {
 		// 判断是否为星期日的00:00:00
 		if now.Hour() == 0 && now.Minute() == 0 && now.Second() == 0 {
 			return now
@@ -16,7 +16,7 @@ func GetNextSunday(now time.Time) time.Time {
 			next = next.Add(time.Hour * 24 * 7)
 		}
 	} else {
-		for now.Weekday() != 0 {
+		for now.Weekday() != weekday {
 			now = now.Add(time.Hour * 24)
 		}
 		next = time.Date(now.Year(), now.Month(), now.Day(), 0, 0, 0, 0, now.Location())

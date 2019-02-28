@@ -4,9 +4,16 @@ import (
 	"database/sql"
 	"fmt"
 	"util/think"
+	"util/thinkLog"
+	"util/thinkString"
 )
 
-func Update(tx *sql.Tx, sqlString string, args ...interface{}) int64 {
+// 文件描述:
+// 数据库 mysql 的增删改查
+// 使用 (SQL语句, 参数...) 来提交语句
+
+func Delete(tx *sql.Tx, sqlString string, args ...interface{}) int64 {
+	thinkLog.DebugLog.PrintSQL(sqlString, args)
 	var result sql.Result
 	var err error
 	var affect int64
@@ -15,14 +22,32 @@ func Update(tx *sql.Tx, sqlString string, args ...interface{}) int64 {
 	} else {
 		result, err = tx.Exec(sqlString, args...)
 	}
-	think.Check(err)
+	think.IsNil(err)
 	affect, err = result.RowsAffected()
-	think.Check(err)
+	think.IsNil(err)
+
+	return affect
+}
+
+func Update(tx *sql.Tx, sqlString string, args ...interface{}) int64 {
+	thinkLog.DebugLog.PrintSQL(sqlString, args)
+	var result sql.Result
+	var err error
+	var affect int64
+	if tx == nil {
+		result, err = Idb.Exec(sqlString, args...)
+	} else {
+		result, err = tx.Exec(sqlString, args...)
+	}
+	think.IsNil(err)
+	affect, err = result.RowsAffected()
+	think.IsNil(err)
 
 	return affect
 }
 
 func Insert(tx *sql.Tx, sqlString string, args ...interface{}) int64 {
+	thinkLog.DebugLog.PrintSQL(sqlString, args)
 	var result sql.Result
 	var err error
 	var last int64
@@ -31,14 +56,53 @@ func Insert(tx *sql.Tx, sqlString string, args ...interface{}) int64 {
 	} else {
 		result, err = tx.Exec(sqlString, args...)
 	}
-	think.Check(err)
+	think.IsNil(err)
 	last, err = result.LastInsertId()
-	think.Check(err)
+	think.IsNil(err)
 
 	return last
 }
 
+// INSERT INTO table_name (col1,col2,col3...) VALUES (v1,v2,v3...),(v1,v2,v3...),(v1,v2,v3...)
+func InsertBatch(tx *sql.Tx, tableName string, cols []string, values [][]string) int64 {
+	sqlString := "INSERT INTO " + tableName + " ("
+	for i := 0; i < len(cols); i++ {
+		sqlString += cols[i] + ","
+	}
+	thinkString.ReplaceLastRune(&sqlString, ')')
+
+	var valueString = " VALUES "
+	for i := 0; i < len(values); i++ {
+		value := values[i]
+		valueString += "("
+		for j := 0; j < len(value); j++ {
+			valueString += value[j] + ","
+		}
+		thinkString.ReplaceLastRune(&valueString, ')')
+		valueString += ","
+	}
+	valueString = valueString[len(valueString)-1:]
+
+	sqlString += valueString
+	thinkLog.DebugLog.Println(sqlString)
+
+	var result sql.Result
+	var err error
+	var affect int64
+	if tx == nil {
+		result, err = Idb.Exec(sqlString)
+	} else {
+		result, err = tx.Exec(sqlString)
+	}
+	think.IsNil(err)
+	affect, err = result.RowsAffected()
+	think.IsNil(err)
+
+	return affect
+}
+
 func SelectMap(tx *sql.Tx, sqlString string, args ...interface{}) ([]string, []map[string]string) {
+	thinkLog.DebugLog.PrintSQL(sqlString, args)
 	resultMapSlice := make([]map[string]string, 0)
 	var rows *sql.Rows
 	var err error
@@ -48,10 +112,10 @@ func SelectMap(tx *sql.Tx, sqlString string, args ...interface{}) ([]string, []m
 		rows, err = tx.Query(sqlString, args...)
 	}
 	defer rows.Close()
-	think.Check(err)
+	think.IsNil(err)
 	columns, err := rows.Columns()
 	//fmt.Println("columns",len(columns),columns[0])
-	think.Check(err)
+	think.IsNil(err)
 	for rows.Next() {
 		resultMap := make(map[string]string)
 		tempByteSLice := make([]sql.RawBytes, len(columns))
@@ -79,10 +143,11 @@ func SelectMap(tx *sql.Tx, sqlString string, args ...interface{}) ([]string, []m
 func GetColumnsType(sqlString string) {
 	var rows *sql.Rows
 	rows, err := Idb.Query(sqlString)
-	think.Check(err)
+	think.IsNil(err)
+	defer rows.Close()
 	for rows.Next() {
 		columnsType, err := rows.ColumnTypes()
-		think.Check(err)
+		think.IsNil(err)
 		for j := 0; j < len(columnsType); j++ {
 			fmt.Println(columnsType[j].ScanType(), "")
 		}
@@ -91,6 +156,7 @@ func GetColumnsType(sqlString string) {
 
 }
 func SelectList(tx *sql.Tx, sqlString string, args ...interface{}) ([]string, [][]string) {
+	thinkLog.DebugLog.PrintSQL(sqlString, args)
 	var rows *sql.Rows
 	var err error
 	if tx == nil {
@@ -98,10 +164,10 @@ func SelectList(tx *sql.Tx, sqlString string, args ...interface{}) ([]string, []
 	} else {
 		rows, err = tx.Query(sqlString, args...)
 	}
-	think.Check(err)
-	//thinkLog.DebugLog.PrintSQL(sqlString, args)
+	think.IsNil(err)
+	defer rows.Close()
 	columns, err := rows.Columns()
-	think.Check(err)
+	think.IsNil(err)
 
 	// 因为 go不会自动把 slice 转换成 interface{} 类型的 slice
 	// 所以必须手动转换

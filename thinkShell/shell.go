@@ -87,8 +87,8 @@ func RunBash(commands []string, stopBash chan bool) []byte {
 // file必须在运行外的函数执行,类似于db
 func createBat(commands []string, filePath, fileName string) string {
 	// 生成文件
-	file, err := os.OpenFile(filePath+fileName, os.O_WRONLY|os.O_CREATE, 0766)
-	think.Check(err)
+	file, err := os.OpenFile(filePath+fileName, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0766)
+	think.IsNil(err)
 	var buffer bytes.Buffer
 	for i := 0; i < len(commands); i++ {
 		buffer.WriteString(commands[i])

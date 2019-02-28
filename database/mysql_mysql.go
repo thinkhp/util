@@ -1,12 +1,10 @@
-package info
+package database
 
 import (
 	"database/sql"
-	"util/database"
 	"util/think"
 )
 
-// !!!!!!!!!!!!停止更细
 // 表字段的详细信息
 type TableFiled struct {
 	// 字段名
@@ -32,7 +30,7 @@ type TableFiled struct {
 // 获取全部数据库
 func GetDatabases() []string {
 	sqlString := "SHOW DATABASES"
-	_, rows := database.SelectList(nil, sqlString)
+	_, rows := SelectList(nil, sqlString)
 	//fmt.Println(columns)
 	// columns: Database
 	databases := make([]string, 0)
@@ -43,9 +41,9 @@ func GetDatabases() []string {
 }
 
 //
-func GetTables(databaseName string) []string {
+func GetAllTable(databaseName string) []string {
 	sqlString := "SELECT distinct TABLE_NAME FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA=?"
-	_, rows := database.SelectList(nil, sqlString, databaseName)
+	_, rows := SelectList(nil, sqlString, databaseName)
 
 	// fmt.Println(columns)
 	// columns: TABLE_NAME
@@ -56,9 +54,9 @@ func GetTables(databaseName string) []string {
 	return tables
 }
 
-func GetFields(databaseName, tableName string) []TableFiled {
+func GetAllField(databaseName, tableName string) []TableFiled {
 	sqlString := "SHOW FULL COLUMNS FROM " + databaseName + "." + tableName
-	rows := database.Select(nil, sqlString)
+	rows := Select(nil, sqlString)
 	defer rows.Close()
 
 	fields := make([]TableFiled, 0)
@@ -73,13 +71,21 @@ func GetFields(databaseName, tableName string) []TableFiled {
 	var Comment sql.NullString
 	for rows.Next() {
 		err := rows.Scan(&Field, &Type, &Collation, &Null, &Key, &Default, &Extra, &Privileges, &Comment)
-		think.Check(err)
+		think.IsNil(err)
 		filed := TableFiled{Field.String, Type.String, Collation.String, Null.String, Key.String, Default.String,
 			Extra.String, Privileges.String, Comment.String}
 		fields = append(fields, filed)
 	}
 
 	return fields
+}
+
+func TruncateTable(tableName string) {
+	sqlString := "truncate table " + tableName
+	result, err := Idb.Exec(sqlString)
+	think.IsNil(err)
+	_, err = result.RowsAffected()
+	think.IsNil(err)
 }
 
 func sqlString() {

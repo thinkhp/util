@@ -1,43 +1,26 @@
 package thinkJson
 
 import (
-	"encoding/json"
-	"io/ioutil"
-	"net/http"
+	"errors"
 	"reflect"
 	"time"
-	"util/think"
 	"util/timeUtil"
-	"errors"
 )
 
-type JsonObject map[string]interface{}
-
-//要将json数据解码写入一个接口类型值，函数会将数据解码为如下类型写入接口：
-//Bool                   对应JSON布尔类型
-//float64                对应JSON数字类型
-//string                 对应JSON字符串类型
-//[]interface{}          对应JSON数组
-//map[string]interface{} 对应JSON对象
-//nil                    对应JSON的null
-func GetJsonObject(data []byte) JsonObject {
-	jsonObject := make(map[string]interface{})
-	// !!!json.Unmarshal第二个参数为指针,jsonObject
-	json.Unmarshal(data, &jsonObject)
-	return jsonObject
+func (jsonObject JsonObject) GetInterface(key string) interface{} {
+	return jsonObject[key]
 }
 
-// 以下函数含有参数校验:若为nil,panic()
 func (jsonObject JsonObject) GetObject(key string) (JsonObject, error) {
 	jsonObjectUnder, ok := jsonObject[key].(map[string]interface{})
 	if ok {
 		return jsonObjectUnder, nil
 	} else {
-		return nil,errors.New("json:not get map[string]interface{} from " + key)
+		return nil, errors.New("json:not get map[string]interface{} from " + key)
 	}
 }
 
-func (jsonObject JsonObject) GetBool(key string) (bool,error) {
+func (jsonObject JsonObject) GetBool(key string) (bool, error) {
 	flag, ok := jsonObject[key].(bool)
 	if ok {
 		return flag, nil
@@ -60,7 +43,7 @@ func (jsonObject JsonObject) GetInt(key string) (int, error) {
 	if ok {
 		return int(num), nil
 	} else {
-		return 0,errors.New("json:not get int from " + key)
+		return 0, errors.New("json:not get int from " + key)
 	}
 }
 
@@ -69,7 +52,7 @@ func (jsonObject JsonObject) GetFloat64(key string) (float64, error) {
 	if ok {
 		return num, nil
 	} else {
-		return 0.0,errors.New("json:not get float from " + key)
+		return 0.0, errors.New("json:not get float from " + key)
 	}
 }
 
@@ -85,7 +68,7 @@ func (jsonObject JsonObject) GetTime(key string) (time.Time, error) {
 func (jsonObject JsonObject) GetList(key string) ([]JsonObject, error) {
 	list, ok := jsonObject[key].([]interface{})
 	if !ok {
-		return make([]JsonObject,0), errors.New("json:not get []interface{} from " + key)
+		return make([]JsonObject, 0), errors.New("json:not get []interface{} from " + key)
 	}
 	var jsonObjectSlice = make([]JsonObject, 0, len(list))
 	for i := 0; i < len(list); i++ {
@@ -125,12 +108,4 @@ func (jsonObject JsonObject) GetStruct(ptr interface{}) {
 			field.SetPointer(nil)
 		}
 	}
-}
-
-func GetJsonObjectFromRequest(r *http.Request) JsonObject {
-	body, err := ioutil.ReadAll(r.Body)
-	defer r.Body.Close()
-	think.Check(err)
-
-	return GetJsonObject(body)
 }

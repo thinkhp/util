@@ -17,30 +17,56 @@ func TaskNow(nextTime string, f ...func()) {
 		f[i]()
 	}
 	for true {
-		task(nextTime, f...)
+		next, err := GetNextTime(nextTime)
+		think.IsNil(err)
+		task(*next, f...)
 	}
 
 }
 func Task(nextTime string, f ...func()) {
 	for true {
-		task(nextTime, f...)
+		next, err := GetNextTime(nextTime)
+		think.IsNil(err)
+		task(*next, f...)
 	}
 }
 
-func task(nextTime string, f ...func()) {
+func TaskNowWithSleep(sleepTime time.Duration, f ...func()) {
+	for i := 0; i < len(f); i++ {
+		f[i]()
+	}
+	next := time.Now()
+	for true {
+		next = next.Add(sleepTime)
+		task(next, f...)
+	}
+}
+func TaskWithSleep(sleepTime time.Duration, f ...func()) {
+	next := time.Now()
+	for true {
+		next = next.Add(sleepTime)
+		task(next, f...)
+	}
+}
+
+func task(next time.Time, f ...func()) {
 	defer func() {
 		if r := recover(); r != nil {
 			thinkLog.ErrorLog.Println("[recover] 程序已恢复")
 		}
 	}()
-	now := time.Now()
-	next, err := GetNextTime(nextTime)
-	think.Check(err)
+	// 确定下次运行的实际时间 next
 	for i := 0; i < len(f); i++ {
 		funcName := runtime.FuncForPC(reflect.ValueOf(f[i]).Pointer()).Name()
 		thinkLog.DebugLog.Println(funcName, "\t\t nextTime:", next)
 	}
-	time.Sleep(next.Sub(now))
+	dur := next.Sub(time.Now())
+	if dur < 0 {
+		panic("程序执行时间大于间隔时长")
+	} else {
+		time.Sleep(dur)
+	}
+	// 执行函数
 	for i := 0; i < len(f); i++ {
 		f[i]()
 	}

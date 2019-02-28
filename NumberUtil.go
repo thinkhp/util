@@ -5,11 +5,15 @@ import (
 	"strconv"
 )
 
-func KeepDecimal(num float64, i int) float64 {
+func KeepDecimal(f float64, i int) float64 {
+	m := math.Pow10(i)
+	x := int(f*m + 0.5)
+	return float64(x) / m
+}
+
+func Round(f float64, i int) float64 {
 	n := math.Pow10(i)
-	x := int(num*n + 0.5)
-	// 四舍五入
-	return float64(x) / n
+	return math.Trunc((f+0.5/n)*n) / n
 }
 
 func FormatFloat(f float64, decimal int) string {
