@@ -73,7 +73,7 @@ func GetFields(databaseName, tableName string) []TableFiled {
 	var Comment sql.NullString
 	for rows.Next() {
 		err := rows.Scan(&Field, &Type, &Collation, &Null, &Key, &Default, &Extra, &Privileges, &Comment)
-		think.Check(err)
+		think.IsNil(err)
 		filed := TableFiled{Field.String, Type.String, Collation.String, Null.String, Key.String, Default.String,
 			Extra.String, Privileges.String, Comment.String}
 		fields = append(fields, filed)
