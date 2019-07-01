@@ -5,4 +5,4 @@ database/info/info_test.go
 thinkFile/FileUtil_test.go
 thinkShell/shell_test.go
 test.txt
-.sql
+*.sql
