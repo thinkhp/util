@@ -16,6 +16,10 @@ type Response struct {
 	Data interface{} `json:"data"`
 }
 
+func WriteStatus(w http.ResponseWriter, statusCode int){
+	w.WriteHeader(statusCode)
+}
+
 // 返回HTML
 func WriteHTMLPage(w http.ResponseWriter, path string) {
 	w.Header().Set("Content-Type", "text/html; charset=utf-8")
@@ -34,7 +38,6 @@ func WriteHTML(w http.ResponseWriter, body []byte) {
 func WriteJsonOk(w http.ResponseWriter, data interface{}) {
 	writeJson(w, 20000, "ok", data)
 }
-
 func WriteJsonFail(w http.ResponseWriter, code int, msg string) {
 	writeJson(w, code, msg, nil)
 }
@@ -45,13 +48,13 @@ func writeJson(w http.ResponseWriter, code int, msg string, data interface{}) {
 	// json化,私有属性无法json化
 	bytes, err := json.Marshal(response)
 	think.IsNil(err)
-	thinkLog.DebugLog.PrintParams("", "send, body", string(bytes))
+	thinkLog.DebugLog.PrintParams("", "response, body", string(bytes))
 	w.Write(bytes)
 }
 
 func WriteJson(w http.ResponseWriter, data interface{})  {
 	w.Header().Set("Content-Type", "application/json")
 	bytes := thinkJson.MustMarshal(data)
-	thinkLog.DebugLog.PrintParams("", "send, body", string(bytes))
+	thinkLog.DebugLog.PrintParams("", "response, body", string(bytes))
 	w.Write(bytes)
 }

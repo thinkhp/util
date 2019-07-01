@@ -11,12 +11,12 @@ func (jsonObject JsonObject) GetInterface(key string) interface{} {
 	return jsonObject[key]
 }
 
-func (jsonObject JsonObject) GetObject(key string) (JsonObject, error) {
+func (jsonObject JsonObject) GetJsonObject(key string) (jsonObjectUnder JsonObject, err error) {
 	jsonObjectUnder, ok := jsonObject[key].(map[string]interface{})
 	if ok {
 		return jsonObjectUnder, nil
 	} else {
-		return nil, errors.New("json:not get map[string]interface{} from " + key)
+		return nil, ErrNotGetValue{jsonObjectUnder, key}
 	}
 }
 

@@ -8,6 +8,7 @@ import (
 )
 
 func TestGetJsonObject(t *testing.T) {
+	fmt.Println(MustGetJsonObject(nil))
 
 	m := map[string]interface{}{
 		"hello": "hello",
@@ -27,3 +28,5 @@ func happenErr() (s map[string]string, err error) {
 	return s, ErrNotGetValue{reflect.TypeOf(s), "hello"}
 
 }
+
+

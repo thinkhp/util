@@ -11,12 +11,12 @@ type Response struct {
 	Data       interface{} `json:"data"`
 }
 
-// 废弃
+// Deprecated:
 func GetResponseJsonFail(w http.ResponseWriter, code int, msg string, status int) {
 	getResponseJson(w, code, msg, nil, status)
 }
 
-// 废弃
+// Deprecated:
 func GetResponseJsonOK(w http.ResponseWriter, obj interface{}) {
 	getResponseJson(w, 200, "ok", obj)
 }
@@ -25,6 +25,7 @@ func GetResponseJsonOK(w http.ResponseWriter, obj interface{}) {
 // suc 对于输出内容的判断,true:输出成功;bool:错误信息
 // obj 返回主体
 // suc, code, msg, data, status
+// Deprecated:
 func getResponseJson(w http.ResponseWriter, code int, msg string, obj interface{}, status ...int) {
 	// 状态码
 	if len(status) != 0 {

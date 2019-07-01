@@ -56,20 +56,20 @@ func GetYesterdayString(now time.Time) string {
 	return GetYesterday(now).String()[0:10]
 }
 
-// 获取日期 yyyy-mm-dd
+// 获取日期 yyyy-mm-dd[:10]
 // 获取截取字符串
 func GetDateString(time time.Time) string {
 	timeString := time.String()
-	return timeString[0:10]
+	return timeString[:10]
 }
 
-// 获取日期 yyyy-mm-dd hh:mm:ss
+// 获取日期 yyyy-mm-dd hh:mm:s[:19]
 func GetDateTimeString(time time.Time) string {
 	time.Format("2006-01-02 03:04:05 PM")
 	// time.Format("02/01/2006 15:04:05 PM")
 	// time.Format("2006-01-02 15:04:05")
 	timeString := time.String()
-	return timeString[0:19]
+	return timeString[:19]
 }
 
 //const (

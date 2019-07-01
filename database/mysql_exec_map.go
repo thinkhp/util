@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"util/think"
 	"util/thinkLog"
-	"util/thinkString"
 )
 
 // 文件描述:
@@ -29,38 +28,42 @@ func Delete(tx *sql.Tx, sqlString string, args ...interface{}) int64 {
 	return affect
 }
 
-func Update(tx *sql.Tx, sqlString string, args ...interface{}) int64 {
+func Update(tx *sql.Tx, sqlString string, args ...interface{}) (affect int64, err error) {
 	thinkLog.DebugLog.PrintSQL(sqlString, args)
 	var result sql.Result
-	var err error
-	var affect int64
 	if tx == nil {
 		result, err = Idb.Exec(sqlString, args...)
 	} else {
 		result, err = tx.Exec(sqlString, args...)
 	}
-	think.IsNil(err)
+	if err != nil {
+		return 0, err
+	}
 	affect, err = result.RowsAffected()
-	think.IsNil(err)
+	if err != nil {
+		return 0, err
+	}
 
-	return affect
+	return affect, nil
 }
 
-func Insert(tx *sql.Tx, sqlString string, args ...interface{}) int64 {
+func Insert(tx *sql.Tx, sqlString string, args ...interface{}) (last int64, err error) {
 	thinkLog.DebugLog.PrintSQL(sqlString, args)
 	var result sql.Result
-	var err error
-	var last int64
 	if tx == nil {
 		result, err = Idb.Exec(sqlString, args...)
 	} else {
 		result, err = tx.Exec(sqlString, args...)
 	}
-	think.IsNil(err)
+	if err != nil {
+		return 0, err
+	}
 	last, err = result.LastInsertId()
-	think.IsNil(err)
+	if err != nil {
+		return 0, err
+	}
 
-	return last
+	return last, nil
 }
 
 // INSERT INTO table_name (col1,col2,col3...) VALUES (v1,v2,v3...),(v1,v2,v3...),(v1,v2,v3...)
@@ -69,19 +72,20 @@ func InsertBatch(tx *sql.Tx, tableName string, cols []string, values [][]string)
 	for i := 0; i < len(cols); i++ {
 		sqlString += cols[i] + ","
 	}
-	thinkString.ReplaceLastRune(&sqlString, ')')
+	sqlString = sqlString[:len(sqlString)-1] + ")"
 
 	var valueString = " VALUES "
 	for i := 0; i < len(values); i++ {
 		value := values[i]
 		valueString += "("
 		for j := 0; j < len(value); j++ {
-			valueString += value[j] + ","
+			valueString += "'" + value[j] + "'" + ","
 		}
-		thinkString.ReplaceLastRune(&valueString, ')')
+		valueString = valueString[:len(valueString)-1] + ")"
+		//thinkString.ReplaceLastRune(&valueString, ')')
 		valueString += ","
 	}
-	valueString = valueString[len(valueString)-1:]
+	valueString = valueString[:len(valueString)-1]
 
 	sqlString += valueString
 	thinkLog.DebugLog.Println(sqlString)

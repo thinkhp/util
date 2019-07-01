@@ -44,7 +44,7 @@ func MustGetJsonObject(data []byte) JsonObject {
 	return jsonObject
 }
 
-// 废弃
+// Deprecated:
 // 因为要尽量减少工具包之间的关联性,所以要将该功能拆分
 func GetJsonObjectFromRequest(r *http.Request) JsonObject {
 	body, err := ioutil.ReadAll(r.Body)

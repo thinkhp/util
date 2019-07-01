@@ -2,18 +2,9 @@ package think
 
 import (
 	"database/sql"
-	"net/http"
 	"runtime/debug"
 	"util/thinkLog"
 )
-
-// 默认 defer
-func DeferRecover(w http.ResponseWriter) {
-	if r := recover(); r != nil {
-		thinkLog.ErrorLog.Println("[recover] 程序已恢复")
-		GetResponseJsonFail(w, 500, "server error", 500)
-	}
-}
 
 func DeferRecoverCommon() {
 	if r := recover(); r != nil {
@@ -30,7 +21,7 @@ func ClearTransaction(tx *sql.Tx) {
 		// 回滚无异常,说明发生回滚
 		thinkLog.ErrorLog.Println("[rollback] 事务回滚")
 		// 发生回滚,说明有异常发生,输出之前发生的异常
-		thinkLog.ErrorLog.Println("请自行查找错误原因")
+		thinkLog.ErrorLog.Println("事务未提交,或请自行查找错误原因")
 		thinkLog.ErrorLog.Println(string(debug.Stack()))
 
 	} else {

@@ -8,6 +8,7 @@ import (
 
 // !!!!!!!!!!!!停止更细
 // 表字段的详细信息
+// Deprecated:
 type TableFiled struct {
 	// 字段名
 	Field string
@@ -30,6 +31,7 @@ type TableFiled struct {
 }
 
 // 获取全部数据库
+// Deprecated:
 func GetDatabases() []string {
 	sqlString := "SHOW DATABASES"
 	_, rows := database.SelectList(nil, sqlString)
@@ -42,7 +44,8 @@ func GetDatabases() []string {
 	return databases
 }
 
-//
+// table_name
+// Deprecated:
 func GetTables(databaseName string) []string {
 	sqlString := "SELECT distinct TABLE_NAME FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA=?"
 	_, rows := database.SelectList(nil, sqlString, databaseName)
@@ -56,6 +59,7 @@ func GetTables(databaseName string) []string {
 	return tables
 }
 
+// Deprecated:
 func GetFields(databaseName, tableName string) []TableFiled {
 	sqlString := "SHOW FULL COLUMNS FROM " + databaseName + "." + tableName
 	rows := database.Select(nil, sqlString)
@@ -82,6 +86,7 @@ func GetFields(databaseName, tableName string) []TableFiled {
 	return fields
 }
 
+// Deprecated:
 func sqlString() {
 	str := make([]string, 0)
 	str = append(str, "SHOW GLOBAL VARIABLES")

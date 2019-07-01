@@ -109,6 +109,8 @@ func InsertStruct(tx *sql.Tx, tableName string, notNilMap map[string]string) int
 	return last
 }
 
+// 批量插入,insert ignore into
+// 因为插入语句中的 insert (col...) 中 col 是统一的,所以在插入结构体时,必须保证属性中值的存在具有一致性
 func InsertBatchStruct(tx *sql.Tx, tableName string, notNilMapList *[]map[string]string) int64 {
 	keyList := make([]string, 0)
 	sqlString := "INSERT IGNORE INTO " + tableName + " ("

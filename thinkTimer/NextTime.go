@@ -12,17 +12,17 @@ import (
 )
 
 // 立即执行
+// Deprecated:
 func TaskNow(nextTime string, f ...func()) {
+	// 立即运行函数f
 	for i := 0; i < len(f); i++ {
 		f[i]()
 	}
-	for true {
-		next, err := GetNextTime(nextTime)
-		think.IsNil(err)
-		task(*next, f...)
-	}
-
+	// 添加定时执行
+	Task(nextTime, f...)
 }
+
+// Deprecated:
 func Task(nextTime string, f ...func()) {
 	for true {
 		next, err := GetNextTime(nextTime)
@@ -31,6 +31,7 @@ func Task(nextTime string, f ...func()) {
 	}
 }
 
+// Deprecated:
 func TaskNowWithSleep(sleepTime time.Duration, f ...func()) {
 	for i := 0; i < len(f); i++ {
 		f[i]()
@@ -41,6 +42,8 @@ func TaskNowWithSleep(sleepTime time.Duration, f ...func()) {
 		task(next, f...)
 	}
 }
+
+// Deprecated:
 func TaskWithSleep(sleepTime time.Duration, f ...func()) {
 	next := time.Now()
 	for true {

@@ -1,6 +1,10 @@
 package thinkHttp
 
-import "net/http"
+import (
+	"fmt"
+	"net/http"
+	"strings"
+)
 
 type ThinkRequest struct {
 	Url      string
@@ -17,6 +21,20 @@ func AddHttpFunc(url string, function func(http.ResponseWriter, *http.Request), 
 	} else {
 		RequestMap[url] = &ThinkRequest{url, function, role[0]}
 	}
+}
+
+func FindHttpFunc(url string) (func(http.ResponseWriter, *http.Request), bool){
+	// url携带?和=
+	if strings.Contains(url, "?") && strings.Contains(url, "=") {
+		i := strings.Index(url, "?")
+		url = url[:i]
+	}
+	fmt.Println("匹配URL", url)
+	f, ok := RequestMap[url]
+	if ok {
+		return f.Function, true
+	}
+	return nil, false
 }
 
 // 注册静态文件服务器

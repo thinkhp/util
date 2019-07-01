@@ -3,6 +3,7 @@ package database
 import (
 	"database/sql"
 	"util/think"
+	"util/thinkLog"
 )
 
 // 表字段的详细信息
@@ -31,8 +32,7 @@ type TableFiled struct {
 func GetDatabases() []string {
 	sqlString := "SHOW DATABASES"
 	_, rows := SelectList(nil, sqlString)
-	//fmt.Println(columns)
-	// columns: Database
+
 	databases := make([]string, 0)
 	for i := 0; i < len(rows); i++ {
 		databases = append(databases, rows[i][0])
@@ -40,13 +40,11 @@ func GetDatabases() []string {
 	return databases
 }
 
-//
-func GetAllTable(databaseName string) []string {
+// 获取数据库下全部数据表
+func GetTables(databaseName string) []string {
 	sqlString := "SELECT distinct TABLE_NAME FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA=?"
 	_, rows := SelectList(nil, sqlString, databaseName)
 
-	// fmt.Println(columns)
-	// columns: TABLE_NAME
 	tables := make([]string, 0)
 	for i := 0; i < len(rows); i++ {
 		tables = append(tables, rows[i][0])
@@ -54,8 +52,14 @@ func GetAllTable(databaseName string) []string {
 	return tables
 }
 
-func GetAllField(databaseName, tableName string) []TableFiled {
-	sqlString := "SHOW FULL COLUMNS FROM " + databaseName + "." + tableName
+// 获取数据表下全部字段
+func GetFields(databaseName, tableName string) []TableFiled {
+	sqlString := ""
+	if databaseName == ""{
+		sqlString = "SHOW FULL COLUMNS FROM " + tableName
+	} else {
+		sqlString = "SHOW FULL COLUMNS FROM " + databaseName + "." + tableName
+	}
 	rows := Select(nil, sqlString)
 	defer rows.Close()
 
@@ -80,12 +84,27 @@ func GetAllField(databaseName, tableName string) []TableFiled {
 	return fields
 }
 
+func Exec(sqlString string) (sql.Result, error){
+	thinkLog.DebugLog.Println(sqlString)
+	result, err := Idb.Exec(sqlString)
+
+	return result, err
+}
+
 func TruncateTable(tableName string) {
 	sqlString := "truncate table " + tableName
-	result, err := Idb.Exec(sqlString)
+
+	result, err := Exec(sqlString)
 	think.IsNil(err)
 	_, err = result.RowsAffected()
 	think.IsNil(err)
+}
+
+func GetDDL(tableName string) string {
+	sqlString := "SHOW CREATE TABLE " + tableName
+	_, rows := SelectMap(nil, sqlString)
+	//fmt.Println(rows)
+	return rows[0]["Create Table"]
 }
 
 func sqlString() {

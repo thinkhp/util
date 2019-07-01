@@ -21,6 +21,11 @@ var DebugLogFile *os.File
 var WarnLogFile *os.File
 var ErrorLogFile *os.File
 var SystemLogFile *os.File
+//为何使用变量这样的方式,无法赋值 os.xxxxxx
+//var DefaultDebugLogFile = os.Stdout
+//var DefaultWarnLogFile = os.Stdout
+//var DefaultErrorLogFile = os.Stderr
+//var DefaultSystemLogFile = os.Stdout
 var DefaultSetting = true
 
 type thinkDebugLogger struct {
@@ -37,6 +42,7 @@ type thinkSystemLogger struct {
 }
 
 func init() {
+	// 设定日志格式
 	DebugLog.SetFlags(log.LstdFlags | log.Lshortfile)
 	DebugLog.SetPrefix("[DEBUG] ")
 	WarnLog.SetFlags(log.LstdFlags | log.Lshortfile)
@@ -45,6 +51,12 @@ func init() {
 	ErrorLog.SetPrefix("[ERROR] ")
 	SystemLog.SetFlags(log.LstdFlags | log.Lshortfile)
 	SystemLog.SetPrefix("[SYSTEM] ")
+	// 指定默认输出
+	defaultOutput()
+}
+
+func defaultOutput(){
+	DefaultSetting = true
 	DebugLog.SetOutput(os.Stdout)
 	WarnLog.SetOutput(os.Stdout)
 	ErrorLog.SetOutput(os.Stderr)
@@ -54,11 +66,7 @@ func init() {
 // 必须等待日志初始化后完成后才可以继续运行
 func SetLogFileTask() {
 	settingOk := make(chan bool)
-	go func() {
-		for true {
-			setLogFileTask()
-		}
-	}()
+	go setLogFileTask()
 	go func(setting chan bool) {
 		for DefaultSetting {
 			time.Sleep(time.Millisecond)
@@ -73,15 +81,20 @@ func SetLogFileTask() {
 func setLogFileTask() {
 	defer func() {
 		if r := recover(); r != nil {
-			fmt.Println("[recover] 日志已恢复")
+			fmt.Println("[recover] 日志已恢复,文件均指向标准输出")
+			// 取消日志
+			defaultOutput()
 		}
 	}()
-	duration := time.Hour * 24
-	setLogFile(duration)
-	next := time.Now().Add(duration)
-	next = time.Date(next.Year(), next.Month(), next.Day(), 0, 0, 0, 0, next.Location())
-	fmt.Println("util/thinkLog.setLogFile", "  nextTime:", next)
-	time.Sleep(next.Sub(time.Now()))
+	for true {
+		duration := time.Hour * 24
+		// 设定输出频率:每天
+		setLogFile(duration)
+		next := time.Now().Add(duration)
+		next = time.Date(next.Year(), next.Month(), next.Day(), 0, 0, 0, 0, next.Location())
+		fmt.Println("util/thinkLog.setLogFile", "  nextTime:", next)
+		time.Sleep(next.Sub(time.Now()))
+	}
 }
 
 func setLogFile(duration time.Duration) {
@@ -103,48 +116,59 @@ func setLogFile(duration time.Duration) {
 	case time.Second: // 日志的密度以秒为单位
 		fileNameUnSuffix = GetTimeStringForFileName(now)[:19]
 	}
-	if LogDir != "" {
-		logFile := func(level string) *os.File {
-			// 如果path指定了一个已经存在的目录，MkdirAll不做任何操作并返回nil。
-			err := os.MkdirAll(LogDir, os.ModePerm)
-			if err != nil {
-				panic(err)
-			}
-			fileName := LogDir + level + fileNameUnSuffix + ".log"
-			file, err := os.OpenFile(fileName, os.O_WRONLY|os.O_CREATE|os.O_APPEND, 0766)
-			if err != nil {
-				panic(err)
-			}
-			// 本次打开的文件如果close,log日志无法写入
-			// file.Close()
-			return file
-		}
-		DebugLogFile = logFile("debug")
-		WarnLogFile = logFile("debug")
-		ErrorLogFile = logFile("error")
+	DebugLogFile = logFile("debug", fileNameUnSuffix)
+	WarnLogFile = logFile("debug", fileNameUnSuffix)
+	ErrorLogFile = logFile("error", fileNameUnSuffix)
 
-		mu.Lock()
-		DebugLog.SetOutput(DebugLogFile)
-		WarnLog.SetOutput(WarnLogFile)
-		ErrorLog.SetOutput(ErrorLogFile)
-		mu.Unlock()
-	}
+	mu.Lock()
+	DebugLog.SetOutput(DebugLogFile)
+	WarnLog.SetOutput(WarnLogFile)
+	ErrorLog.SetOutput(ErrorLogFile)
+	mu.Unlock()
+
+	//
 	if !DefaultSetting {
-		olderDebugLogFile.Close()
-		olderWarnLogFile.Close()
-		olderErrorLogFile.Close()
+		defer olderDebugLogFile.Close()
+		defer olderWarnLogFile.Close()
+		defer olderErrorLogFile.Close()
 	}
 	DefaultSetting = false
 }
 
+// 获取日志文件的指针*os.File
+func logFile(level string,fileNameUnSuffix string) *os.File{
+	// 如果path指定了一个已经存在的目录，MkdirAll不做任何操作并返回nil。
+	err := os.MkdirAll(LogDir, os.ModePerm)
+	if err != nil {
+		panic(err)
+	}
+	// e.g: ./log/debug20180304123456.log
+	fileName := LogDir + level + fileNameUnSuffix + ".log"
+	file, err := os.OpenFile(fileName, os.O_WRONLY|os.O_CREATE|os.O_APPEND, 0766)
+	if err != nil {
+		panic(err)
+	}
+	// 本次打开的文件如果close,log日志无法写入
+	// file.Close()
+	return file
+}
+
+// 在Linux中,因为不存在文件保护,所以要检查文件名所对应的指针是否存在
+func checkFile(filename string){
+	_, err := os.Stat(filename)
+	if err != nil {
+		panic(err)
+	}
+}
+
 func (t *thinkDebugLogger) PrintSQL(sqlString string, params []interface{}) {
-	t.Println("query:", sqlString)
 	printStr := "params: "
 	for _, str := range params {
 		printStr += fmt.Sprint(str)
 		printStr += ","
 	}
 	thinkString.ReplaceLastRune(&printStr, 0)
+	t.Println("query:", sqlString)
 	t.Println(printStr)
 }
 
@@ -164,3 +188,5 @@ func (t *thinkDebugLogger) PrintParams(url, paramKind string, params ...string) 
 func GetTimeStringForFileName(now time.Time) string {
 	return now.Format("2006-01-02T15-04-05.999999999")
 }
+
+
