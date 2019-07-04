@@ -28,5 +28,3 @@ func happenErr() (s map[string]string, err error) {
 	return s, ErrNotGetValue{reflect.TypeOf(s), "hello"}
 
 }
-
-

@@ -23,7 +23,7 @@ func AddHttpFunc(url string, function func(http.ResponseWriter, *http.Request), 
 	}
 }
 
-func FindHttpFunc(url string) (func(http.ResponseWriter, *http.Request), bool){
+func FindHttpFunc(url string) (func(http.ResponseWriter, *http.Request), bool) {
 	// url携带?和=
 	if strings.Contains(url, "?") && strings.Contains(url, "=") {
 		i := strings.Index(url, "?")

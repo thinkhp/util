@@ -6,7 +6,7 @@ import (
 	"time"
 )
 
-func TestTask(t *testing.T){
+func TestTask(t *testing.T) {
 	ts := New()
 	task := ts.AddTask("* * * * * *", printTask)
 
@@ -19,6 +19,6 @@ func TestTask(t *testing.T){
 	fmt.Println(ts.flags)
 }
 
-func printTask(){
+func printTask() {
 	println(time.Now().String()[:19])
 }

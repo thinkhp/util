@@ -1,10 +1,10 @@
 package cache
 
 import (
-	"util/thinkJson"
-	"util/think"
 	"io/ioutil"
 	"os"
+	"util/think"
+	"util/thinkJson"
 )
 
 type Cache struct {
@@ -20,9 +20,9 @@ type InDisk struct {
 type InMemory map[string][]string
 
 // 初始化缓冲
-func (c *Cache)Init(filePath, fileName string){
+func (c *Cache) Init(filePath, fileName string) {
 	// disk -> memory
-	c.InDisk = InDisk{filePath+fileName}
+	c.InDisk = InDisk{filePath + fileName}
 	c.InMemory = make(map[string][]string)
 
 	bs, err := ioutil.ReadFile(c.InDisk.FileFullName)
@@ -35,11 +35,11 @@ func (c *Cache)Init(filePath, fileName string){
 	}
 }
 
-func (c *Cache)Get(key string) []string {
+func (c *Cache) Get(key string) []string {
 	return c.InMemory[key]
 }
 
-func (c *Cache)Add(key string, value string){
+func (c *Cache) Add(key string, value string) {
 	list := c.InMemory[key]
 	for _, v := range list {
 		if v == value {

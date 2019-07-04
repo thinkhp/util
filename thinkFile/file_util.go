@@ -79,7 +79,6 @@ func OpenFile(filePath string, fileName string, flag int) *os.File {
 	return file
 }
 
-
 func ReadFile(fileFullName string) *os.File {
 	file, err := os.OpenFile(fileFullName, os.O_RDONLY, 0766)
 	think.IsNil(err)

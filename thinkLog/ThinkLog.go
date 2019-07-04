@@ -21,6 +21,7 @@ var DebugLogFile *os.File
 var WarnLogFile *os.File
 var ErrorLogFile *os.File
 var SystemLogFile *os.File
+
 //为何使用变量这样的方式,无法赋值 os.xxxxxx
 //var DefaultDebugLogFile = os.Stdout
 //var DefaultWarnLogFile = os.Stdout
@@ -55,7 +56,7 @@ func init() {
 	defaultOutput()
 }
 
-func defaultOutput(){
+func defaultOutput() {
 	DefaultSetting = true
 	DebugLog.SetOutput(os.Stdout)
 	WarnLog.SetOutput(os.Stdout)
@@ -136,7 +137,7 @@ func setLogFile(duration time.Duration) {
 }
 
 // 获取日志文件的指针*os.File
-func logFile(level string,fileNameUnSuffix string) *os.File{
+func logFile(level string, fileNameUnSuffix string) *os.File {
 	// 如果path指定了一个已经存在的目录，MkdirAll不做任何操作并返回nil。
 	err := os.MkdirAll(LogDir, os.ModePerm)
 	if err != nil {
@@ -154,7 +155,7 @@ func logFile(level string,fileNameUnSuffix string) *os.File{
 }
 
 // 在Linux中,因为不存在文件保护,所以要检查文件名所对应的指针是否存在
-func checkFile(filename string){
+func checkFile(filename string) {
 	_, err := os.Stat(filename)
 	if err != nil {
 		panic(err)
@@ -188,5 +189,3 @@ func (t *thinkDebugLogger) PrintParams(url, paramKind string, params ...string) 
 func GetTimeStringForFileName(now time.Time) string {
 	return now.Format("2006-01-02T15-04-05.999999999")
 }
-
-

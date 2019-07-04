@@ -32,10 +32,9 @@ func GetPublicIp() string {
 
 	return ip
 
-
 }
 
-func getPublicIpPost(url string) (string, error){
+func getPublicIpPost(url string) (string, error) {
 	body, err := SendPost(url, map[string]string{}, nil)
 	think.IsNil(err)
 
@@ -44,7 +43,7 @@ func getPublicIpPost(url string) (string, error){
 	return reg.FindString(string(body)), nil
 }
 
-func getPublicIpGet(url string) (string, error){
+func getPublicIpGet(url string) (string, error) {
 	body, err := SendGet(url, map[string]string{})
 	think.IsNil(err)
 

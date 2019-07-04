@@ -28,7 +28,7 @@ func ExampleSendPost() {
 		"count":  20,
 	}
 
-	resBody, err := SendPost(url, nil,  thinkJson.MustMarshal(paramsMap))
+	resBody, err := SendPost(url, nil, thinkJson.MustMarshal(paramsMap))
 	think.IsNil(err)
 	res := thinkJson.MustGetJsonObject(resBody)
 	haveAccessToken := res["access_token"]

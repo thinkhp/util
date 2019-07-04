@@ -97,9 +97,8 @@ func SliceWriteExcel(filePath, fileName string, slice [][]string, columns []stri
 //	}
 //}
 
-
 // 将excel中的数据转换为[][]string
-func ReadExcel(fileName string, sheetIndex int) (rowsData [][]string){
+func ReadExcel(fileName string, sheetIndex int) (rowsData [][]string) {
 	rowsData = make([][]string, 0)
 
 	excel, err := xlsx.OpenFile(fileName)

@@ -1,8 +1,9 @@
-util_test.go
-thinkHttp/thinkHttp_test.go
-database/database_test.go
-database/info/info_test.go
-thinkFile/FileUtil_test.go
-thinkShell/shell_test.go
-test.txt
+/util_test.go
+/thinkHttp/thinkHttp_test.go
+/database/database_test.go
+/database/info/info_test.go
+/thinkFile/FileUtil_test.go
+/thinkShell/shell_test.go
+/test.txt
 *.sql
+/.idea/*

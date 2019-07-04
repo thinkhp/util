@@ -23,5 +23,3 @@ func ToRedirect(w http.ResponseWriter, newPath string) {
 	w.Header().Set("Location", newPath)
 	w.WriteHeader(301)
 }
-
-

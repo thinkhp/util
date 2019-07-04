@@ -21,10 +21,11 @@ func SendGet(url string, headersMap map[string]string) ([]byte, error) {
 func SendPost(url string, headersMap map[string]string, params []byte) ([]byte, error) {
 	return Send(http.DefaultClient, http.MethodPost, url, headersMap, params)
 }
+
 //e.g.
 // POST Send(http.MethodPost, "http://www.baidu.com", nil, []byte("{'key'='value'}"))
 // Get	Send(http.MethodGet, "https://www.baidu.com/s?wd=keyword", nil, nil)
-func Send(client *http.Client,method string, url string, headersMap map[string]string, params []byte) ([]byte, error) {
+func Send(client *http.Client, method string, url string, headersMap map[string]string, params []byte) ([]byte, error) {
 
 	var request *http.Request
 	var err error

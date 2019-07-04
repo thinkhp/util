@@ -16,7 +16,7 @@ type Response struct {
 	Data interface{} `json:"data"`
 }
 
-func WriteStatus(w http.ResponseWriter, statusCode int){
+func WriteStatus(w http.ResponseWriter, statusCode int) {
 	w.WriteHeader(statusCode)
 }
 
@@ -52,7 +52,7 @@ func writeJson(w http.ResponseWriter, code int, msg string, data interface{}) {
 	w.Write(bytes)
 }
 
-func WriteJson(w http.ResponseWriter, data interface{})  {
+func WriteJson(w http.ResponseWriter, data interface{}) {
 	w.Header().Set("Content-Type", "application/json")
 	bytes := thinkJson.MustMarshal(data)
 	thinkLog.DebugLog.PrintParams("", "response, body", string(bytes))

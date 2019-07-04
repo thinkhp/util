@@ -55,7 +55,7 @@ func GetTables(databaseName string) []string {
 // 获取数据表下全部字段
 func GetFields(databaseName, tableName string) []TableFiled {
 	sqlString := ""
-	if databaseName == ""{
+	if databaseName == "" {
 		sqlString = "SHOW FULL COLUMNS FROM " + tableName
 	} else {
 		sqlString = "SHOW FULL COLUMNS FROM " + databaseName + "." + tableName
@@ -84,7 +84,7 @@ func GetFields(databaseName, tableName string) []TableFiled {
 	return fields
 }
 
-func Exec(sqlString string) (sql.Result, error){
+func Exec(sqlString string) (sql.Result, error) {
 	thinkLog.DebugLog.Println(sqlString)
 	result, err := Idb.Exec(sqlString)
 

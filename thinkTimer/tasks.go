@@ -17,6 +17,7 @@ type ThinkTasks struct {
 	//
 	startSwitch bool
 }
+
 // 任务
 type ThinkTask struct {
 	TaskId   int
@@ -24,7 +25,7 @@ type ThinkTask struct {
 	TaskName string
 
 	// 状态相关
-	Flag      bool
+	Flag       bool
 	CreateTime time.Time
 	UpdateTime time.Time
 	StartTime  time.Time
@@ -34,18 +35,18 @@ type ThinkTask struct {
 	Params map[string]interface{}
 }
 
-func (ts *ThinkTasks)Init() *ThinkTasks{
+func (ts *ThinkTasks) Init() *ThinkTasks {
 	ts.tasks = make(map[string]*ThinkTask)
 	ts.startSwitch = false
 
 	return ts
 }
 
-func (ts *ThinkTasks)GetTasks() map[string]*ThinkTask{
+func (ts *ThinkTasks) GetTasks() map[string]*ThinkTask {
 	return ts.tasks
 }
 
-func (ts *ThinkTasks)AddTaskNow(nextTime string, params map[string]interface{}, f ...func()) *ThinkTask{
+func (ts *ThinkTasks) AddTaskNow(nextTime string, params map[string]interface{}, f ...func()) *ThinkTask {
 	// 立即运行函数f
 	for i := 0; i < len(f); i++ {
 		f[i]()
@@ -53,7 +54,7 @@ func (ts *ThinkTasks)AddTaskNow(nextTime string, params map[string]interface{}, 
 	return ts.AddTask(nextTime, params, f...)
 }
 
-func (ts *ThinkTasks)AddTask(nextTime string, params map[string]interface{}, f ...func()) *ThinkTask{
+func (ts *ThinkTasks) AddTask(nextTime string, params map[string]interface{}, f ...func()) *ThinkTask {
 	// 添加任务
 	t := new(ThinkTask)
 	t.CreateTime = time.Now()
@@ -76,37 +77,37 @@ func (ts *ThinkTasks)AddTask(nextTime string, params map[string]interface{}, f .
 	return t
 }
 
-func (ts *ThinkTasks)StopTask(taskGuid string){
+func (ts *ThinkTasks) StopTask(taskGuid string) {
 	if ts.getFlags(taskGuid) {
 		ts.setFlags(taskGuid, false)
 	}
 }
 
-func (ts *ThinkTasks)setTasks(t *ThinkTask){
+func (ts *ThinkTasks) setTasks(t *ThinkTask) {
 	ts.locker.Lock()
 	defer ts.locker.Unlock()
 	ts.tasks[t.TaskGuid] = t
 }
-func (ts *ThinkTasks)getTasks(taskGuid string) *ThinkTask{
+func (ts *ThinkTasks) getTasks(taskGuid string) *ThinkTask {
 	ts.locker.RLock()
 	defer ts.locker.RUnlock()
 
 	return ts.tasks[taskGuid]
 }
-func (ts *ThinkTasks)delTasks(taskGuid string){
+func (ts *ThinkTasks) delTasks(taskGuid string) {
 	ts.locker.Lock()
 	defer ts.locker.Unlock()
 
 	delete(ts.tasks, taskGuid)
 }
-func (ts *ThinkTasks)setFlags(taskGuid string, flag bool){
+func (ts *ThinkTasks) setFlags(taskGuid string, flag bool) {
 	t := ts.getTasks(taskGuid)
 	if t != nil {
 		t.Flag = flag
 	}
 
 }
-func (ts *ThinkTasks)getFlags(taskGuid string) bool{
+func (ts *ThinkTasks) getFlags(taskGuid string) bool {
 	t := ts.getTasks(taskGuid)
 	if t != nil {
 		return t.Flag
