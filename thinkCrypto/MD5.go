@@ -13,3 +13,9 @@ func GetMD5(str string) string {
 	// 16进制字符表示的编解码
 	return hex.EncodeToString(cipherStr)
 }
+
+func GetMD5Std(str string) string {
+	cipherStr := md5.Sum([]byte(str))
+
+	return hex.EncodeToString(cipherStr[:])
+}

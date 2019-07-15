@@ -19,5 +19,6 @@ func TestEncoding(t *testing.T) {
 
 func TestMd5(t *testing.T) {
 	s := "15891467397"
-	fmt.Println(len(GetMD5(s)))
+	fmt.Println(GetMD5(s))
+	fmt.Println(GetMD5Std(s))
 }
