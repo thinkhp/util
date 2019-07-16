@@ -26,7 +26,6 @@ func SendPost(url string, headersMap map[string]string, params []byte) ([]byte, 
 // POST Send(http.MethodPost, "http://www.baidu.com", nil, []byte("{'key'='value'}"))
 // Get	Send(http.MethodGet, "https://www.baidu.com/s?wd=keyword", nil, nil)
 func Send(client *http.Client, method string, url string, headersMap map[string]string, params []byte) ([]byte, error) {
-
 	var request *http.Request
 	var err error
 
@@ -40,6 +39,7 @@ func Send(client *http.Client, method string, url string, headersMap map[string]
 	}
 	// 发送
 	//client := http.Client{}
+	//fmt.Println("timeout:", client.Timeout)
 	response, err := client.Do(request)
 	think.IsNil(err)
 	// 解析回应

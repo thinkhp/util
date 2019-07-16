@@ -100,8 +100,8 @@ func CreatePath(path string) {
 	}
 }
 
-// basePath: ././XXX/YYY
-// return: /XXX/YYY/ZZZ/AAA/
+// basePath: ./XXX/YYY
+// return: /AAA/BBB/XXX/YYY
 func GetAbsPathWith(basePath string) string {
 	basePath = strings.Replace(basePath, "/", string(os.PathSeparator), -1)
 	path, err := filepath.Abs(basePath)
