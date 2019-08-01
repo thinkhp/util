@@ -146,6 +146,7 @@ func GetTimeFromSqlString(date string) time.Time {
 }
 
 // 第一个参数是格式，第二个是要转换的时间字符串
+// 对于空字符串,time为零值
 func GetTimeFromString(date string) time.Time {
 	loc, _ := time.LoadLocation("Local")
 	var t time.Time

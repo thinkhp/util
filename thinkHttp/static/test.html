@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>http测试</title>
+</head>
+<body>
+    <button onclick="download()">下载</button>
+    <img src="http://localhost:8080/static/logo.png" />
+    <script>
+        let host = window.location.origin
+        function sendHttp(method, url,data, callback) {
+            let xhr = new XMLHttpRequest()
+            // show.innerText += host + url
+
+            xhr.open(method,url,true)
+            xhr.setRequestHeader("Content-Type","application/json")
+            let str = JSON.stringify(data)
+            // show.innerText += str
+            xhr.send(str)
+            // 监听事件
+            xhr.onreadystatechange = function () {
+                // show.innerText += xhr.readyState
+                // 4 为完成,表示接收到全部响应数据
+                if (xhr.readyState == 4) {
+                    // || xhr.status == 304 存在缓冲
+                    // show.innerText += xhr.status
+                    if (xhr.status == 200) {
+                        // show.innerText += xhr.response
+                        callback(xhr.response)
+                        // 判断响应数据类型
+                        let type = xhr.getResponseHeader("Content-Type")
+                        console.log("type",type)
+                        console.log("text",xhr.responseText)
+                        if (type.indexOf("xml") != -1 && xhr.responseXML){
+                            // DOM
+                            response = xhr.responseXML
+                        } else if (type.indexOf("application/json") != -1 || type.indexOf("text/plain") != -1) {
+                            response = JSON.parse(xhr.responseText)
+
+                        } else {
+                            response = xhr.responseText
+                        }
+                        // callback(response)
+                    } else {
+                        // show.innerText += "系统繁忙"
+                        alert("系统繁忙")
+                    }
+                }
+            }
+        }
+        function sendPostHttpBlob(url,data, callback) {
+            let xhr = new XMLHttpRequest()
+            // show.innerText += host + url
+
+            xhr.open("POST",host + url,true)
+            xhr.setRequestHeader("Content-Type","application/json")
+            // xhr.setRequestHeader("Access-Control-Allow-Origin", "*")
+            xhr.responseType = 'blob'
+            let str = JSON.stringify(data)
+            // show.innerText += str
+            xhr.send(str)
+            // 监听事件
+            xhr.onreadystatechange = function () {
+                // show.innerText += xhr.readyState
+                // 4 为完成,表示接收到全部响应数据
+                if (xhr.readyState == 4) {
+                    // || xhr.status == 304 存在缓冲
+                    // show.innerText += xhr.status
+                    if (xhr.status == 200) {
+                        // show.innerText += xhr.response
+                        callback(xhr.response)
+                        // 判断响应数据类型
+                        // let type = xhr.getResponseHeader("Content-Type")
+                        // console.log("type",type)
+                        // console.log("text",xhr.responseText)
+                        // if (type.indexOf("xml") != -1 && xhr.responseXML){
+                        //     // DOM
+                        //     response = xhr.responseXML
+                        // } else if (type.indexOf("application/json") != -1 || type.indexOf("text/plain") != -1) {
+                        //     response = JSON.parse(xhr.responseText)
+                        //
+                        // } else {
+                        //     response = xhr.responseText
+                        // }
+                        // callback(response)
+                    } else {
+                        // show.innerText += "系统繁忙"
+                        alert("系统繁忙")
+                    }
+                }
+            }
+        }
+        function download() {
+            let url = "http://localhost:8080/static/access.go"
+            sendHttp("GET", url, {}, function (res) {
+                console.log(res)
+            })
+
+        }
+
+    </script>
+
+</body>
+</html>
