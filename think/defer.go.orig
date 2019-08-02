@@ -1,0 +1,15 @@
+package think
+
+import (
+	"util/thinkLog"
+)
+
+func DeferRecoverCommon() {
+	if r := recover(); r != nil {
+		thinkLog.ErrorLog.Println("[recover] 程序已恢复:", r)
+	}
+<<<<<<< HEAD
+}
+=======
+}
+>>>>>>> bcaecf324d1a3a2789f778cf07d1df0eb7a49f14

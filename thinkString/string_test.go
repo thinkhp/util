@@ -17,3 +17,7 @@ func TestUrlE(t *testing.T) {
 func TestUrlUn(t *testing.T) {
 	fmt.Println(url.QueryUnescape("https%3A%2F%2Fbtl188.com%2Ffengqiu%2Fcode%2Fget"))
 }
+
+func TestUUID(t *testing.T) {
+	fmt.Println(UUID(32))
+}

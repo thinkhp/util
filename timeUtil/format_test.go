@@ -30,3 +30,8 @@ func TestGetTimeStringForFileName(t *testing.T) {
 	test(time.Second)
 
 }
+
+
+func TestGetTimeFromString(t *testing.T) {
+	fmt.Println(GetTimeFromString(""))
+}

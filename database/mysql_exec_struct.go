@@ -57,7 +57,11 @@ func DeleteStruct(tx *sql.Tx, tableName string, primaryKeyName string, primaryKe
 	return affect
 }
 
+// insert			报错
+// insert ignore	忽略
+// replace			替换
 // 存在唯一索引的插入,不会panic
+
 // INSERT IGNORE INTO table_name (col1,col2,col3...) VALUES (v1,v2,v3...),(v1,v2,v3...),(v1,v2,v3...)
 func InsertStructUnique(tx *sql.Tx, tableName string, notNilMap map[string]string) int64 {
 	sqlString := "INSERT IGNORE INTO " + tableName + " ("

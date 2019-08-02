@@ -1,6 +1,7 @@
 package thinkFile
 
 import (
+	"io"
 	"os"
 	"path/filepath"
 	"strings"
@@ -132,4 +133,19 @@ func ListFile(path string, suffix string) []string {
 	})
 
 	return allFile
+}
+
+func CopyFile(dst, src string) error{
+	file, err := os.OpenFile(src, os.O_RDONLY, 0440)
+	if err != nil {
+		return err
+	}
+	defer file.Close()
+	fileNew, err := os.OpenFile(dst, os.O_CREATE|os.O_TRUNC|os.O_WRONLY, 0660)
+	if err != nil {
+		return err
+	}
+	defer fileNew.Close()
+	_, err = io.Copy(fileNew, file)
+	return err
 }
