@@ -3,7 +3,6 @@ package file
 import (
 	"bytes"
 	"encoding/binary"
-	"fmt"
 	"io"
 )
 
@@ -44,6 +43,6 @@ func Header(NumChannels, SampleRates, BitPerSample, fileSize int) []byte {
 }
 
 func addLE(w io.Writer, src interface{}) error {
-	fmt.Println(binary.Size(src), src)
+	//fmt.Println(binary.Size(src), src)
 	return binary.Write(w, binary.LittleEndian, src)
 }

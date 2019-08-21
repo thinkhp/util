@@ -6,5 +6,6 @@
 /thinkShell/shell_test.go
 /test.txt
 *.sql
+/wav/*.wav
 /.idea/*
 *.orgi
