@@ -1,11 +1,11 @@
 package thinkJson
 
 import (
-	"testing"
 	"fmt"
+	"testing"
 )
 
-func TestJson(t *testing.T){
+func TestJson(t *testing.T) {
 	i := 0
 	fmt.Println(string(MustMarshal(i)))
 	s := ""

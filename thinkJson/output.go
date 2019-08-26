@@ -5,7 +5,7 @@ import (
 	"sort"
 )
 
-func MapJsonBySortKey(params map[string]interface{}, sortKey []string) string{
+func MapJsonBySortKey(params map[string]interface{}, sortKey []string) string {
 	if len(sortKey) == 0 {
 		for key, _ := range params {
 			sortKey = append(sortKey, key)
@@ -24,4 +24,3 @@ func MapJsonBySortKey(params map[string]interface{}, sortKey []string) string{
 
 	return j
 }
-

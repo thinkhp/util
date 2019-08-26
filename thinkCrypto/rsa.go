@@ -76,7 +76,7 @@ func MakeSignMy(params map[string]interface{}, privateKeyStr string) string {
 	return base64.StdEncoding.EncodeToString(signByte)
 }
 
-func VerifySignMy(params map[string]interface{}, publicKeyStr, sign string) bool{
+func VerifySignMy(params map[string]interface{}, publicKeyStr, sign string) bool {
 	//
 	publicKey, err := GenPublicKey(publicKeyStr)
 	think.IsNil(err)
@@ -89,7 +89,6 @@ func VerifySignMy(params map[string]interface{}, publicKeyStr, sign string) bool
 	think.IsNil(err)
 	return bytes.Equal(sum[:], sumEn)
 }
-
 
 func UnPadding(src []byte, keySize int) [][]byte {
 
@@ -112,4 +111,3 @@ func UnPadding(src []byte, keySize int) [][]byte {
 	}
 	return v
 }
-

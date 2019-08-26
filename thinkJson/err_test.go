@@ -11,15 +11,13 @@ func TestGetJsonObject(t *testing.T) {
 	//fmt.Println(MustGetJsonObject(nil))
 
 	m := map[string]interface{}{
-		"test": 1,
+		"test":  1,
 		"hello": "hello",
 		"str":   "ok",
 		"m": map[string]interface{}{
 			"num": 1,
 		},
-
 	}
-
 
 	for i := 0; i < 3; i++ {
 		fmt.Println(string(MustMarshal(m)))

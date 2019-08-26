@@ -44,7 +44,7 @@ func MustGetJsonObject(data []byte) JsonObject {
 	return jsonObject
 }
 
-func MustGetList(data []byte) []interface{}{
+func MustGetList(data []byte) []interface{} {
 	list := make([]interface{}, 0)
 	// !!!json.Unmarshal第二个参数为指针,jsonObject
 	err := json.Unmarshal(data, &list)
@@ -60,7 +60,6 @@ func GetList(data []byte) ([]interface{}, error) {
 	err := json.Unmarshal(data, &list)
 	return list, err
 }
-
 
 // Deprecated:
 // 因为要尽量减少工具包之间的关联性,所以要将该功能拆分

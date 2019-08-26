@@ -12,4 +12,4 @@ type JsonFloat float64
 type JsonString string
 type JsonList []interface{}
 type JsonMap map[string]interface{}
-type JsonInterface interface {}
+type JsonInterface interface{}

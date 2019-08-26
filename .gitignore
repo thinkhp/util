@@ -9,3 +9,4 @@
 /wav/*.wav
 /.idea/*
 *.orgi
+fmt.sh

@@ -6,6 +6,6 @@ import (
 	"testing"
 )
 
-func TestFileMode(t *testing.T){
+func TestFileMode(t *testing.T) {
 	fmt.Println(os.ModePerm.String())
 }

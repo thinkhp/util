@@ -31,7 +31,6 @@ func TestGetTimeStringForFileName(t *testing.T) {
 
 }
 
-
 func TestGetTimeFromString(t *testing.T) {
 	fmt.Println(GetTimeFromString(""))
 }

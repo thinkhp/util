@@ -26,7 +26,7 @@ func TestUUID(t *testing.T) {
 	fmt.Println(UUID(32))
 }
 
-func TestGB2312(t *testing.T){
+func TestGB2312(t *testing.T) {
 	utf8Str := "hello"
 	utf8Byte := []byte(utf8Str)
 
@@ -40,16 +40,15 @@ func TestGB2312(t *testing.T){
 	fmt.Println(gbByte)
 	fmt.Println(gbStr)
 
-
 }
 
-func TestGetGb2312(t *testing.T)  {
+func TestGetGb2312(t *testing.T) {
 	e := simplifiedchinese.HZGB2312.NewEncoder()
 	gb, _ := e.Bytes([]byte("// 此处为字符串string,结束"))
 	fmt.Println(gb)
 }
 
-func UTF82GB2312(s []byte)([]byte, error) {
+func UTF82GB2312(s []byte) ([]byte, error) {
 	reader := transform.NewReader(bytes.NewReader(s), simplifiedchinese.GBK.NewEncoder())
 	d, e := ioutil.ReadAll(reader)
 	if e != nil {
@@ -58,11 +57,10 @@ func UTF82GB2312(s []byte)([]byte, error) {
 	return d, nil
 }
 
-
 // 此处为字符串string,结束 [47 47 32 230 173 164 229 164 132 228 184 186 229 173 151 231 172 166 228 184 178 115 116 114 105 110 103 44 231 187 147 230 157 159]
 // �˴�Ϊ�ַ���string,���� [47 47 32 180 203 180 166 206 170 215 214 183 251 180 174 115 116 114 105 110 103 44 189 225 202 248]
 // ~{4K4&N*WV7{4.~}string,~{=aJx [47 47 32 126 123 52 75 52 38 78 42 87 86 55 123 52 46 126 125 115 116 114 105 110 103 44 126 123 61 97 74 120]
-func TestFile(t *testing.T){
+func TestFile(t *testing.T) {
 	var check = func(err error) {
 		if err != nil {
 			panic(err)

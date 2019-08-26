@@ -7,7 +7,7 @@ import (
 	"util/think"
 )
 
-func Test1(t *testing.T){
+func Test1(t *testing.T) {
 	port := ":8081"
 	//dir, err := os.Getwd()
 	//think.IsNil(err)
@@ -17,12 +17,11 @@ func Test1(t *testing.T){
 	think.IsNil(err)
 }
 
-func PageHandler(w http.ResponseWriter, r *http.Request){
+func PageHandler(w http.ResponseWriter, r *http.Request) {
 	WriteHTMLPage(w, "./static/test.html")
 }
 
-
-func Test2(t *testing.T){
+func Test2(t *testing.T) {
 	port := ":8080"
 	dir, err := os.Getwd()
 	think.IsNil(err)

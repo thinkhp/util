@@ -135,7 +135,7 @@ func ListFile(path string, suffix string) []string {
 	return allFile
 }
 
-func CopyFile(dst, src string) error{
+func CopyFile(dst, src string) error {
 	file, err := os.OpenFile(src, os.O_RDONLY, 0440)
 	if err != nil {
 		return err

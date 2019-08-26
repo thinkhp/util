@@ -1,15 +1,15 @@
 package thinkCrypto
 
 import (
+	"crypto"
+	"crypto/md5"
+	"crypto/rand"
+	"crypto/rsa"
+	"encoding/base64"
 	"encoding/hex"
 	"fmt"
 	"testing"
-	"crypto/rsa"
-	"crypto/rand"
-	"crypto/md5"
 	"util/think"
-	"crypto"
-	"encoding/base64"
 )
 
 func TestEncoding(t *testing.T) {
@@ -32,7 +32,7 @@ func TestMd5(t *testing.T) {
 var privateKeyStr = "MIIBVAIBADANBgkqhkiG9w0BAQEFAASCAT4wggE6AgEAAkEAtd6mb1SR+VvacGr5sbEz3m5iWcqmNeJipJaGnJ5bGDErjglqLkVPXIRCbvMRUNEe/IlJdmLRT0sBzYJRDYQbcwIDAQABAkAPdFEOStBwsRZ50Q1QxS8UKqse2DKRh6A8PjJIIsi44GgYMvqXvlN+Vy5q5nYhkvB3Ndfhtn17f5qMalmRUlYRAiEA1/jXOGF4IWMF2okLEX6uRdN7J0o2iF8pcJGVr+l1gKkCIQDXk8SFzDUmZ7Ihvvns+NatHYx/U14Dnh5wdR04HgoguwIgTOAmu8r2F+xHiSJ+7htJrVE55SJlhuVYutkXjyZqzQECIQCYTWhxUqVWPbqGxuLRfbhFU/P33JE2IxbEQqljBS4IkwIgJswLDvDUHtjfuf0hLw61HIRN3ZflB7R/gj+Hw5qUspQ="
 var publicKeyStr = "MFwwDQYJKoZIhvcNAQEBBQADSwAwSAJBALXepm9Ukflb2nBq+bGxM95uYlnKpjXiYqSWhpyeWxgxK44Jai5FT1yEQm7zEVDRHvyJSXZi0U9LAc2CUQ2EG3MCAwEAAQ=="
 
-func TestRSA(t *testing.T){
+func TestRSA(t *testing.T) {
 	origData := "hello world"
 	md5Data := md5.Sum([]byte(origData))
 	fmt.Println("md5Data", base64.StdEncoding.EncodeToString(md5Data[:]))

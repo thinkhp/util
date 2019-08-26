@@ -1,22 +1,22 @@
 package wav
 
 import (
-	"testing"
+	"bytes"
 	"math"
 	"os"
-	"util/think"
-	"bytes"
 	"strconv"
+	"testing"
+	"util/think"
 )
 
-func TestPlay(t *testing.T){
+func TestPlay(t *testing.T) {
 	for i := 0; i < 1; i++ {
 		createWav(1000 + i*100)
 	}
 }
 
-func createWav(hz int){
-	file, err := os.OpenFile("./" + strconv.Itoa(hz) + ".wav", os.O_CREATE|os.O_RDWR|os.O_TRUNC, 0660)
+func createWav(hz int) {
+	file, err := os.OpenFile("./"+strconv.Itoa(hz)+".wav", os.O_CREATE|os.O_RDWR|os.O_TRUNC, 0660)
 	think.IsNil(err)
 	defer file.Close()
 
@@ -29,7 +29,7 @@ func createWav(hz int){
 	file.Write(buf)
 }
 
-func someKind(startHz, oriL int) []byte{
+func someKind(startHz, oriL int) []byte {
 	audio := bytes.NewBuffer(nil)
 
 	l := 48000
@@ -52,7 +52,7 @@ func someKind(startHz, oriL int) []byte{
 	return audio.Bytes()
 }
 
-func oneKind(hz int) []byte{
+func oneKind(hz int) []byte {
 	audio := bytes.NewBuffer(nil)
 
 	audioOri := make([][]float32, 0)
@@ -63,7 +63,7 @@ func oneKind(hz int) []byte{
 }
 
 // 产生一秒的 48k, 32bit 的 hz,标准响度的原声
-func productAudio(hz int) []float32{
+func productAudio(hz int) []float32 {
 	l := 48000 * 1 // 48k * 1s
 	audio := make([]float32, 0)
 
