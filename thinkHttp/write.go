@@ -41,15 +41,18 @@ func WriteJsonOk(w http.ResponseWriter, data interface{}) {
 func WriteJsonFail(w http.ResponseWriter, code int, msg string) {
 	writeJson(w, code, msg, nil)
 }
+func WriteJsonFailWithData(w http.ResponseWriter, code int, msg string, data interface{}){
+	writeJson(w, code, msg, data)
+}
 
 func writeJson(w http.ResponseWriter, code int, msg string, data interface{}) {
 	w.Header().Set("Content-Type", "application/json")
 	response := Response{code, msg, data}
 	// json化,私有属性无法json化
-	bytes, err := json.Marshal(response)
+	bs, err := json.Marshal(response)
 	think.IsNil(err)
-	thinkLog.DebugLog.PrintParams("", "response, body", string(bytes))
-	w.Write(bytes)
+	thinkLog.DebugLog.Println(SprintResponseSend( nil, bs))
+	w.Write(bs)
 }
 
 func WriteJson(w http.ResponseWriter, data interface{}) {

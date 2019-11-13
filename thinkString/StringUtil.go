@@ -1,6 +1,7 @@
 package thinkString
 
 import (
+	"encoding/hex"
 	"fmt"
 	"math/rand"
 	"reflect"
@@ -27,16 +28,41 @@ func IsEmail(b []byte) bool {
 	return emailPattern.Match(b)
 }
 
-//生成随机字符串
-func UUID(lens int) string {
+// 生成随机字符串
+// 非并发安全,基于时间戳的随机都是不安全的
+func UUID(l int) string {
 	str := "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
 	bytes := []byte(str)
 	result := make([]byte, 0)
-	r := rand.New(rand.NewSource(time.Now().UnixNano()))
-	for i := 0; i < lens; i++ {
-		result = append(result, bytes[r.Intn(len(bytes))])
+	rand.Seed(time.Now().UnixNano())
+	for i := 0; i < l; i++ {
+		result = append(result, bytes[rand.Intn(len(bytes))])
 	}
+	//r := rand.New(rand.NewSource(time.Now().UnixNano()))
+	//for i := 0; i < lens; i++ {
+	//	result = append(result, bytes[r.Intn(len(bytes))])
+	//}
 	return string(result)
+}
+
+//const hextable = "0123456789abcdef"
+func RandString(l int) (string, error) {
+	b := make([]byte, l)
+	r := rand.New(rand.NewSource(time.Now().UnixNano()))
+	n, err := r.Read(b)
+	if n != len(b) || err != nil {
+		return "", fmt.Errorf("Could not successfully read from the system CSPRNG:%w ", err)
+	}
+	return hex.EncodeToString(b)[:l], nil
+}
+
+func RandStringSafe(l int) (string, error){
+	b := make([]byte, l)
+	n, err := rand.Read(b)
+	if n != len(b) || err != nil {
+		return "", fmt.Errorf("Could not successfully read from the system CSPRNG:%w ", err)
+	}
+	return hex.EncodeToString(b)[:l], nil
 }
 
 func FirstRuneLarge(s string) string {

@@ -15,6 +15,14 @@ func (jsonObject JsonObject) MustGetJsonObject(key string) (o JsonObject) {
 	return o
 }
 
+func (jsonObject JsonObject) MustGetMap(key string) (o map[string]interface{}) {
+	o, ok := jsonObject[key].(map[string]interface{})
+	if !ok {
+		panic(ErrNotGetValue{o, key})
+	}
+	return o
+}
+
 func (jsonObject JsonObject) MustGetBool(key string) (flag bool) {
 	flag, ok := jsonObject[key].(bool)
 	if !ok {

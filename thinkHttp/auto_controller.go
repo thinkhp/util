@@ -1,7 +1,7 @@
 package thinkHttp
 
 import (
-	"fmt"
+	"log"
 	"net/http"
 	"strings"
 )
@@ -10,6 +10,7 @@ type ThinkRequest struct {
 	Url      string
 	Function func(http.ResponseWriter, *http.Request)
 	Role     int
+	Method   string
 }
 
 var RequestMap = make(map[string]*ThinkRequest)
@@ -17,11 +18,19 @@ var RequestMap = make(map[string]*ThinkRequest)
 // 注册路由
 func AddHttpFunc(url string, function func(http.ResponseWriter, *http.Request), role ...int) {
 	if len(role) == 0 {
-		RequestMap[url] = &ThinkRequest{url, function, 0}
+		RequestMap[url] = &ThinkRequest{url, function, 0, ""}
 	} else {
-		RequestMap[url] = &ThinkRequest{url, function, role[0]}
+		RequestMap[url] = &ThinkRequest{url, function, role[0], ""}
 	}
 }
+
+//func AddHttpPOST(url string, function func(http.ResponseWriter, *http.Request), role ...int) {
+//	if len(role) == 0 {
+//		RequestMap[url] = &ThinkRequest{url, function, 0, http.MethodPost}
+//	} else {
+//		RequestMap[url] = &ThinkRequest{url, function, role[0], http.MethodPost}
+//	}
+//}
 
 func FindHttpFunc(url string) (func(http.ResponseWriter, *http.Request), bool) {
 	urlOri := url
@@ -30,7 +39,7 @@ func FindHttpFunc(url string) (func(http.ResponseWriter, *http.Request), bool) {
 		i := strings.Index(url, "?")
 		url = url[:i]
 	}
-	fmt.Println(urlOri, "匹配URL", url)
+	log.Println(urlOri, "匹配URL", url)
 	f, ok := RequestMap[url]
 	if ok {
 		return f.Function, true

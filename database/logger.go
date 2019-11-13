@@ -15,7 +15,7 @@ func SprintSQL(sqlString string, args ...interface{}) string {
 			log += fmt.Sprint(str)
 			log += ","
 		}
-		thinkString.ReplaceLastRune(&log, '\n')
+		thinkString.ReplaceLastRune(&log, 0)
 	}
 	return log
 }

@@ -52,5 +52,6 @@ func Send(client *http.Client, method string, url string, headersMap map[string]
 	if response.StatusCode != 200 {
 		return body, errors.New(response.Status)
 	}
+
 	return body, nil
 }
