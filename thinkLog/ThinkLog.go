@@ -162,6 +162,7 @@ func checkFile(filename string) {
 	}
 }
 
+//Deprecated
 func (t *thinkDebugLogger) PrintSQL(sqlString string, params []interface{}) {
 	printStr := "params: "
 	for _, str := range params {
@@ -173,6 +174,7 @@ func (t *thinkDebugLogger) PrintSQL(sqlString string, params []interface{}) {
 	t.Println(printStr)
 }
 
+//Deprecated
 // 请求信息,请求参数
 func (t *thinkDebugLogger) PrintParams(url, paramKind string, params ...string) {
 	log := "\n"

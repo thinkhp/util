@@ -51,7 +51,7 @@ func ExampleSend() {
 	}
 	// *取值，&取址
 	params := thinkJson.MustMarshal(paramMap)
-	thinkLog.DebugLog.PrintParams(url, "request params", string(params))
+	thinkLog.DebugLog.Println(url, "request params", string(params))
 	request, err := http.NewRequest("POST", url, bytes.NewReader(params))
 	think.IsNil(err)
 	// 设置header

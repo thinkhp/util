@@ -29,7 +29,7 @@ func Send(client *http.Client, method string, url string, headersMap map[string]
 	var request *http.Request
 	var err error
 
-	thinkLog.DebugLog.PrintParams(url, "send, request params", string(params))
+	thinkLog.DebugLog.Println(SprintRequest(method, url, headersMap, params))
 	// 设置method,url,body
 	request, err = http.NewRequest(method, url, bytes.NewReader(params))
 	think.IsNil(err)
@@ -37,19 +37,20 @@ func Send(client *http.Client, method string, url string, headersMap map[string]
 	for k, v := range headersMap {
 		request.Header.Set(k, v)
 	}
+	//log.Println("resquest", request)
 	// 发送
-	//client := http.Client{}
 	//fmt.Println("timeout:", client.Timeout)
 	response, err := client.Do(request)
 	think.IsNil(err)
-	// 解析回应
-	if response.StatusCode != 200 {
-		return nil, errors.New(response.Status)
-	}
 	body, err := ioutil.ReadAll(response.Body)
 	think.IsNil(err)
 	defer response.Body.Close()
 
-	thinkLog.DebugLog.PrintParams(url, "send, response params", string(body))
+	thinkLog.DebugLog.Println(SprintResponse(response.StatusCode, url, response.Header, body))
+	//log.Println("response", response)
+	// 解析回应
+	if response.StatusCode != 200 {
+		return body, errors.New(response.Status)
+	}
 	return body, nil
 }

@@ -12,7 +12,7 @@ import (
 // 使用 (SQL语句, 参数...) 来提交语句
 
 func Delete(tx *sql.Tx, sqlString string, args ...interface{}) int64 {
-	thinkLog.DebugLog.PrintSQL(sqlString, args)
+	thinkLog.DebugLog.Println(SprintSQL(sqlString, args...))
 	var result sql.Result
 	var err error
 	var affect int64
@@ -29,7 +29,7 @@ func Delete(tx *sql.Tx, sqlString string, args ...interface{}) int64 {
 }
 
 func Update(tx *sql.Tx, sqlString string, args ...interface{}) (affect int64, err error) {
-	thinkLog.DebugLog.PrintSQL(sqlString, args)
+	thinkLog.DebugLog.Println(SprintSQL(sqlString, args...))
 	var result sql.Result
 	if tx == nil {
 		result, err = Idb.Exec(sqlString, args...)
@@ -48,7 +48,7 @@ func Update(tx *sql.Tx, sqlString string, args ...interface{}) (affect int64, er
 }
 
 func Insert(tx *sql.Tx, sqlString string, args ...interface{}) (last int64, err error) {
-	thinkLog.DebugLog.PrintSQL(sqlString, args)
+	thinkLog.DebugLog.Println(SprintSQL(sqlString, args...))
 	var result sql.Result
 	if tx == nil {
 		result, err = Idb.Exec(sqlString, args...)
@@ -106,7 +106,7 @@ func InsertBatch(tx *sql.Tx, tableName string, cols []string, values [][]string)
 }
 
 func SelectMap(tx *sql.Tx, sqlString string, args ...interface{}) ([]string, []map[string]string) {
-	thinkLog.DebugLog.PrintSQL(sqlString, args)
+	thinkLog.DebugLog.Println(SprintSQL(sqlString, args...))
 	resultMapSlice := make([]map[string]string, 0)
 	var rows *sql.Rows
 	var err error
@@ -160,7 +160,7 @@ func GetColumnsType(sqlString string) {
 
 }
 func SelectList(tx *sql.Tx, sqlString string, args ...interface{}) ([]string, [][]string) {
-	thinkLog.DebugLog.PrintSQL(sqlString, args)
+	thinkLog.DebugLog.Println(SprintSQL(sqlString, args...))
 	var rows *sql.Rows
 	var err error
 	if tx == nil {
