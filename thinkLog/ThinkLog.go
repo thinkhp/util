@@ -28,6 +28,7 @@ var SystemLogFile *os.File
 //var DefaultErrorLogFile = os.Stderr
 //var DefaultSystemLogFile = os.Stdout
 var DefaultSetting = true
+var locker sync.Mutex
 
 type thinkDebugLogger struct {
 	log.Logger
@@ -57,7 +58,9 @@ func init() {
 }
 
 func defaultOutput() {
+	locker.Lock()
 	DefaultSetting = true
+	locker.Unlock()
 	DebugLog.SetOutput(os.Stdout)
 	WarnLog.SetOutput(os.Stdout)
 	ErrorLog.SetOutput(os.Stderr)
@@ -69,9 +72,11 @@ func SetLogFileTask() {
 	settingOk := make(chan bool)
 	go setLogFileTask()
 	go func(setting chan bool) {
+		locker.Lock()
 		for DefaultSetting {
 			time.Sleep(time.Millisecond)
 		}
+		locker.Unlock()
 		setting <- true
 		defer close(setting)
 	}(settingOk)
@@ -133,7 +138,9 @@ func setLogFile(duration time.Duration) {
 		defer olderWarnLogFile.Close()
 		defer olderErrorLogFile.Close()
 	}
+	locker.Lock()
 	DefaultSetting = false
+	locker.Unlock()
 }
 
 // 获取日志文件的指针*os.File
