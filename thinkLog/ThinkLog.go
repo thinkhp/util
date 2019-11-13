@@ -22,13 +22,7 @@ var WarnLogFile *os.File
 var ErrorLogFile *os.File
 var SystemLogFile *os.File
 
-//为何使用变量这样的方式,无法赋值 os.xxxxxx
-//var DefaultDebugLogFile = os.Stdout
-//var DefaultWarnLogFile = os.Stdout
-//var DefaultErrorLogFile = os.Stderr
-//var DefaultSystemLogFile = os.Stdout
 var DefaultSetting = true
-var locker sync.Mutex
 
 type thinkDebugLogger struct {
 	log.Logger
@@ -58,9 +52,7 @@ func init() {
 }
 
 func defaultOutput() {
-	locker.Lock()
 	DefaultSetting = true
-	locker.Unlock()
 	DebugLog.SetOutput(os.Stdout)
 	WarnLog.SetOutput(os.Stdout)
 	ErrorLog.SetOutput(os.Stderr)
@@ -69,22 +61,15 @@ func defaultOutput() {
 
 // 必须等待日志初始化后完成后才可以继续运行
 func SetLogFileTask() {
-	settingOk := make(chan bool)
-	go setLogFileTask()
-	go func(setting chan bool) {
-		locker.Lock()
-		for DefaultSetting {
-			time.Sleep(time.Millisecond)
-		}
-		locker.Unlock()
-		setting <- true
-		defer close(setting)
-	}(settingOk)
-	<-settingOk
+	DefaultSetting = false
+	duration := time.Hour * 24
+	//duration := time.Minute
+	setLogFile(duration)
+	go setLogFileTask(duration)
 }
 
 // 每天更改日志指向文件
-func setLogFileTask() {
+func setLogFileTask(duration time.Duration) {
 	defer func() {
 		if r := recover(); r != nil {
 			fmt.Println("[recover] 日志已恢复,文件均指向标准输出")
@@ -93,13 +78,21 @@ func setLogFileTask() {
 		}
 	}()
 	for true {
-		duration := time.Hour * 24
 		// 设定输出频率:每天
-		setLogFile(duration)
 		next := time.Now().Add(duration)
-		next = time.Date(next.Year(), next.Month(), next.Day(), 0, 0, 0, 0, next.Location())
+		switch duration {
+		case time.Hour * 24: // 日志的密度以天为单位
+			next = time.Date(next.Year(), next.Month(), next.Day(), 0, 0, 0, 0, next.Location())
+		case time.Hour: // 日志的密度以小时为单位
+			next = time.Date(next.Year(), next.Month(), next.Day(), next.Hour(), 0, 0, 0, next.Location())
+		case time.Minute: // 日志的密度以分钟为单位
+			next = time.Date(next.Year(), next.Month(), next.Day(), next.Hour(), next.Minute(), 0, 0, next.Location())
+		case time.Second: // 日志的密度以秒为单位
+			next = time.Date(next.Year(), next.Month(), next.Day(), next.Hour(), next.Minute(), next.Second(), 0, next.Location())
+		}
 		fmt.Println("util/thinkLog.setLogFile", "  nextTime:", next)
 		time.Sleep(next.Sub(time.Now()))
+		setLogFile(duration)
 	}
 }
 
@@ -138,9 +131,11 @@ func setLogFile(duration time.Duration) {
 		defer olderWarnLogFile.Close()
 		defer olderErrorLogFile.Close()
 	}
-	locker.Lock()
-	DefaultSetting = false
-	locker.Unlock()
+}
+
+// 因为 import cycle not allowed(thinkLog, thinkTime)
+func GetTimeStringForFileName(now time.Time) string {
+	return now.Format("2006-01-02T15-04-05.999999999")
 }
 
 // 获取日志文件的指针*os.File
@@ -194,7 +189,4 @@ func (t *thinkDebugLogger) PrintParams(url, paramKind string, params ...string) 
 	t.Println(log)
 }
 
-// 因为 import cycle not allowed(thinkLog, thinkTime)
-func GetTimeStringForFileName(now time.Time) string {
-	return now.Format("2006-01-02T15-04-05.999999999")
-}
+
