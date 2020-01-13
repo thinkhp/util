@@ -16,8 +16,9 @@ type Response struct {
 	Data interface{} `json:"data"`
 }
 
-func WriteStatus(w http.ResponseWriter, statusCode int) {
-	w.WriteHeader(statusCode)
+// WriteHeader 必须在 Write,Header().Set 之前,否则报错 http: superfluous
+func WriteStatus(w http.ResponseWriter, httpCode int) {
+	w.WriteHeader(httpCode)
 }
 
 // 返回HTML

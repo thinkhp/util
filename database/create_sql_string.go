@@ -18,7 +18,7 @@ func CreateUpdate(tableName, primaryKeyName string, updateTime time.Time, params
 	s += " SET "
 	if !updateTime.IsZero() {
 		s += "update_time=?,"
-		l = append(l, updateTime)
+		l = append(l, updateTime.String()[:19])
 	}
 
 	for k, v := range params {
@@ -41,7 +41,7 @@ func CreateInsert(tableName, primaryKeyName string, createTime time.Time, params
 	s := "INSERT INTO " + tableName + " ("
 	if !createTime.IsZero() {
 		s += "create_time,"
-		l = append(l, createTime)
+		l = append(l, createTime.String()[:19])
 	}
 
 	for k, v := range params {

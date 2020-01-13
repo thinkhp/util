@@ -17,6 +17,9 @@ type Project struct {
 }
 
 var ErrGOOS = errors.New("不支持的操作系统")
+const GOOSWin = "windows"
+const GOOSMac = "darwin"
+const GOOSLinux = "linux"
 
 func (p Project) Build(aimGOOS string) (output []byte, err error) {
 	exeName := p.Name
@@ -25,25 +28,25 @@ func (p Project) Build(aimGOOS string) (output []byte, err error) {
 	suffix := ""
 	cmds := make([]string, 0, 5)
 	switch aimGOOS {
-	case "windows": //如果要编译运行在 win 下的可执行文件,加后缀 .exe
+	case GOOSWin: //如果要编译运行在 win 下的可执行文件,加后缀 .exe
 		exeName += ".exe"
 	}
 	// 生成脚本(.sh 或者 .bat 文件)
 	switch runtime.GOOS {
-	case "darwin":
+	case GOOSMac:
 		suffix = ".sh"
 		cmds = append(cmds, "#!/usr/bin/env bash\n")
 		cmds = append(cmds, "cd "+binDir+"\n")
 		cmds = append(cmds, fmt.Sprintf("GOOS=%s go build -o %s %s\n", aimGOOS, exeName, mainFile))
 		cmds = append(cmds, "exit 0")
-	case "windows":
+	case GOOSWin:
 		suffix = ".bat"
 		cmds = append(cmds, binDir[:2]+"\n") //盘符
 		cmds = append(cmds, "cd "+binDir+"\n")
 		cmds = append(cmds, "set GOOS="+aimGOOS+"\n")
 		cmds = append(cmds, fmt.Sprintf("go build -o %s %s", exeName, mainFile)+"\n")
 		cmds = append(cmds, "set GOOS=windows\n")
-	case "linux":
+	case GOOSLinux:
 		suffix = ".sh"
 		cmds = append(cmds, "#!/bin/bash\n")
 		cmds = append(cmds, "cd "+binDir+"\n")

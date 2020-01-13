@@ -66,8 +66,47 @@ func Insert(tx *sql.Tx, sqlString string, args ...interface{}) (last int64, err 
 	return last, nil
 }
 
+func InsertIgnoreBatch(tx *sql.Tx ,tableName string, cols []string, values [][]string) int64 {
+	sqlString := "INSERT IGNORE INTO " + tableName + " ("
+	for i := 0; i < len(cols); i++ {
+		sqlString += cols[i] + ","
+	}
+	sqlString = sqlString[:len(sqlString)-1] + ")"
+
+	var valueString = " VALUES "
+	for i := 0; i < len(values); i++ {
+		value := values[i]
+		valueString += "("
+		for j := 0; j < len(value); j++ {
+			valueString += "'" + value[j] + "'" + ","
+		}
+		valueString = valueString[:len(valueString)-1] + ")"
+		//thinkString.ReplaceLastRune(&valueString, ')')
+		valueString += ","
+	}
+	valueString = valueString[:len(valueString)-1]
+
+	sqlString += valueString
+	thinkLog.DebugLog.Println(sqlString)
+
+	var result sql.Result
+	var err error
+	var affect int64
+	if tx == nil {
+		result, err = Idb.Exec(sqlString)
+	} else {
+		result, err = tx.Exec(sqlString)
+	}
+	think.IsNil(err)
+	affect, err = result.RowsAffected()
+	think.IsNil(err)
+
+	return affect
+}
+
 // INSERT INTO table_name (col1,col2,col3...) VALUES (v1,v2,v3...),(v1,v2,v3...),(v1,v2,v3...)
-func InsertBatch(tx *sql.Tx, tableName string, cols []string, values [][]string) int64 {
+func InsertBatch(tx *sql.Tx ,tableName string, cols []string, values [][]string) int64 {
+	//sqlString := insertKind + " " + tableName + " ("
 	sqlString := "INSERT INTO " + tableName + " ("
 	for i := 0; i < len(cols); i++ {
 		sqlString += cols[i] + ","

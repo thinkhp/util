@@ -10,7 +10,13 @@ import (
 	"fmt"
 	"testing"
 	"util/think"
+	"strings"
 )
+
+func TestGetMD5(t *testing.T){
+	s := strings.ToUpper(GetMD5(""))
+	fmt.Println(s)
+}
 
 func TestEncoding(t *testing.T) {
 	// utf-8
@@ -24,7 +30,8 @@ func TestEncoding(t *testing.T) {
 }
 
 func TestMd5(t *testing.T) {
-	s := "15891467397"
+	//s := "15891467397"
+	s := ""
 	fmt.Println(GetMD5(s))
 	fmt.Println(GetMD5Std(s))
 }
