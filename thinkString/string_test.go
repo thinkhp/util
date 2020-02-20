@@ -10,6 +10,19 @@ import (
 	"testing"
 )
 
+func TestGUID(t *testing.T) {
+	r := ""
+	s := "a1ebd961-27af-4f09-b685-1173d8f071d1"
+	for _, v := range s {
+		if v != '-' {
+			r += "1"
+		} else {
+			r += "-"
+		}
+	}
+	fmt.Println(r)
+
+}
 func TestFirstRuneLarge(t *testing.T) {
 	fmt.Println(FirstRuneLarge("hello"))
 }

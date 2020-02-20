@@ -17,11 +17,14 @@ type Project struct {
 }
 
 var ErrGOOS = errors.New("不支持的操作系统")
+var ErrGOARCH = errors.New("不支持的系统架构")
 const GOOSWin = "windows"
 const GOOSMac = "darwin"
 const GOOSLinux = "linux"
+const GOARCH32 = "386"
+const GOARCH64 = "amd64"
 
-func (p Project) Build(aimGOOS string) (output []byte, err error) {
+func (p Project) Build(aimGOOS string, aimARCH string) (output []byte, err error) {
 	exeName := p.Name
 	mainFile := p.Path + p.MainFileName
 	binDir := p.Path
@@ -37,20 +40,21 @@ func (p Project) Build(aimGOOS string) (output []byte, err error) {
 		suffix = ".sh"
 		cmds = append(cmds, "#!/usr/bin/env bash\n")
 		cmds = append(cmds, "cd "+binDir+"\n")
-		cmds = append(cmds, fmt.Sprintf("GOOS=%s go build -o %s %s\n", aimGOOS, exeName, mainFile))
+		cmds = append(cmds, fmt.Sprintf("GOOS=%s GOARCH=%s go build -o %s %s\n", aimGOOS, aimARCH, exeName, mainFile))
 		cmds = append(cmds, "exit 0")
 	case GOOSWin:
 		suffix = ".bat"
 		cmds = append(cmds, binDir[:2]+"\n") //盘符
 		cmds = append(cmds, "cd "+binDir+"\n")
 		cmds = append(cmds, "set GOOS="+aimGOOS+"\n")
+		cmds = append(cmds, "set GOARCH="+aimARCH+"\n")
 		cmds = append(cmds, fmt.Sprintf("go build -o %s %s", exeName, mainFile)+"\n")
 		cmds = append(cmds, "set GOOS=windows\n")
 	case GOOSLinux:
 		suffix = ".sh"
 		cmds = append(cmds, "#!/bin/bash\n")
 		cmds = append(cmds, "cd "+binDir+"\n")
-		cmds = append(cmds, fmt.Sprintf("GOOS=%s go build -o %s %s", aimGOOS, exeName, mainFile)+"\n")
+		cmds = append(cmds, fmt.Sprintf("GOOS=%s GOARCH=%s go build -o %s %s", aimGOOS, aimARCH, exeName, mainFile)+"\n")
 		cmds = append(cmds, "exit 0")
 	default:
 		return nil, ErrGOOS

@@ -16,6 +16,8 @@ type Response struct {
 	Data interface{} `json:"data"`
 }
 
+
+
 // WriteHeader 必须在 Write,Header().Set 之前,否则报错 http: superfluous
 func WriteStatus(w http.ResponseWriter, httpCode int) {
 	w.WriteHeader(httpCode)
@@ -52,13 +54,15 @@ func writeJson(w http.ResponseWriter, code int, msg string, data interface{}) {
 	// json化,私有属性无法json化
 	bs, err := json.Marshal(response)
 	think.IsNil(err)
-	thinkLog.DebugLog.Println(SprintResponseSend( nil, bs))
+	l := new(logger)
+	thinkLog.DebugLog.Println(l.SprintResponseSend( nil, bs))
 	w.Write(bs)
 }
 
 func WriteJson(w http.ResponseWriter, data interface{}) {
 	w.Header().Set("Content-Type", "application/json")
 	bytes := thinkJson.MustMarshal(data)
-	thinkLog.DebugLog.PrintParams("", "response, body", string(bytes))
+	l := new(logger)
+	thinkLog.DebugLog.Println(l.SprintResponseSend( nil, bytes))
 	w.Write(bytes)
 }

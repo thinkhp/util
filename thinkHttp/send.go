@@ -3,11 +3,11 @@ package thinkHttp
 import (
 	"bytes"
 	"errors"
+	"fmt"
 	"io/ioutil"
 	"net/http"
 	"util/think"
 	"util/thinkLog"
-	"fmt"
 )
 
 func SendGetWithClient(client *http.Client, url string, headersMap map[string]string) ([]byte, error) {
@@ -41,9 +41,9 @@ func ForwardDefault(w http.ResponseWriter, r *http.Request, newHost string){
 	w.Write(bodyRes)
 }
 
-// TODO requestID
 func SendWithResponse(client *http.Client, method string, url string, headersMap map[string]string, params []byte) (int, map[string][]string, []byte) {
-	thinkLog.DebugLog.Println(SprintRequest(method, url, headersMap, params))
+	l := new(logger).Init()
+	thinkLog.DebugLog.Println(l.SprintRequest(method, url, headersMap, params))
 	var request *http.Request
 	var err error
 
@@ -60,7 +60,7 @@ func SendWithResponse(client *http.Client, method string, url string, headersMap
 	think.IsNil(err)
 	defer response.Body.Close()
 
-	thinkLog.DebugLog.Println(SprintResponse(response.StatusCode, url, response.Header, body))
+	thinkLog.DebugLog.Println(l.SprintResponse(response.StatusCode, url, response.Header, body))
 	return response.StatusCode, response.Header, body
 }
 
@@ -71,7 +71,8 @@ func Send(client *http.Client, method string, url string, headersMap map[string]
 	var request *http.Request
 	var err error
 
-	thinkLog.DebugLog.Println(SprintRequest(method, url, headersMap, params))
+	l := new(logger).Init()
+	thinkLog.DebugLog.Println(l.SprintRequest(method, url, headersMap, params))
 	// 设置method,url,body
 	request, err = http.NewRequest(method, url, bytes.NewReader(params))
 	think.IsNil(err)
@@ -88,7 +89,7 @@ func Send(client *http.Client, method string, url string, headersMap map[string]
 	think.IsNil(err)
 	defer response.Body.Close()
 
-	thinkLog.DebugLog.Println(SprintResponse(response.StatusCode, url, response.Header, body))
+	thinkLog.DebugLog.Println(l.SprintResponse(response.StatusCode, url, response.Header, body))
 	//log.Println("response", response)
 	// 解析回应
 	if response.StatusCode != 200 {

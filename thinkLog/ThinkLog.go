@@ -147,7 +147,7 @@ func logFile(level string, fileNameUnSuffix string) *os.File {
 	}
 	// e.g: ./log/debug20180304123456.log
 	fileName := LogDir + level + fileNameUnSuffix + ".log"
-	file, err := os.OpenFile(fileName, os.O_WRONLY|os.O_CREATE|os.O_APPEND, 0766)
+	file, err := os.OpenFile(fileName, os.O_WRONLY|os.O_CREATE|os.O_APPEND, 0666)
 	if err != nil {
 		panic(err)
 	}

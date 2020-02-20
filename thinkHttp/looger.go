@@ -2,12 +2,36 @@ package thinkHttp
 
 import (
 	"strconv"
+	"time"
+	"util/thinkString"
 )
 
-func SprintRequest(method string, url string, header map[string]string, body []byte) string{
-	log := ""
+var (
+	LogPrint = true
+	LogPrintResponseBody = true
+)
+type logger struct {
+	uuid string
+	print bool
+	responseBody bool
+}
+
+func (l *logger)Init() *logger{
+	l.uuid = newRequestId()
+
+	return l
+}
+
+func newRequestId() string {
+	uuid := time.Now().Format("20060102150405")
+	uuid += thinkString.UUID(8)
+	return uuid
+}
+
+func (l *logger)SprintRequest(method string, url string, header map[string]string, body []byte) string{
+	log := l.uuid
 	log += "\n"
-	log += "***************************** " + "request,m->>" + " ****************************S\n"
+	log += "***************************** " +"request,m->>" + " ****************************S\n"
 	log += method + " " + url + "\n"
 	for key, value := range header {
 		log += key + ":" + value + "\n"
@@ -20,8 +44,8 @@ func SprintRequest(method string, url string, header map[string]string, body []b
 	return log
 }
 
-func SprintResponse(code int, url string, headers map[string][]string, body []byte) string{
-	log := ""
+func (l *logger)SprintResponse(code int, url string, headers map[string][]string, body []byte) string{
+	log := l.uuid
 	log += "\n"
 	log += "***************************** " + "response,->>m" + " ****************************S\n"
 	log += strconv.Itoa(code)+ " " + url + "\n"
@@ -44,8 +68,8 @@ func SprintResponse(code int, url string, headers map[string][]string, body []by
 	return log
 }
 
-func SprintRequestReceive(method string, url string, header map[string][]string, body []byte) string{
-	log := ""
+func (l *logger)SprintRequestReceive(method string, url string, header map[string][]string, body []byte) string{
+	log := l.uuid
 	log += "\n"
 	log += "***************************** " + "request,->>m" + " ****************************S\n"
 	log += method + " " + url + "\n"
@@ -68,11 +92,10 @@ func SprintRequestReceive(method string, url string, header map[string][]string,
 	return log
 }
 
-func SprintResponseSend(headers map[string]string, body []byte) string {
-	log := ""
+func (l *logger)SprintResponseSend(headers map[string]string, body []byte) string {
+	log := l.uuid
 	log += "\n"
 	log += "***************************** " + "response,m->>" + " ****************************S\n"
-	//log += strconv.Itoa(code)+ "\n"
 	for key, value := range headers {
 		log += key + ":" + value + "\n"
 	}

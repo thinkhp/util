@@ -6,7 +6,7 @@ import (
 	"encoding/base64"
 	"errors"
 	"fmt"
-	"github.com/Go-SQL-Driver/MySQL"
+	"github.com/go-sql-driver/mysql"
 	"os"
 	"reflect"
 	"runtime"

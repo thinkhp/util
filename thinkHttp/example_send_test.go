@@ -6,10 +6,24 @@ import (
 	"fmt"
 	"io/ioutil"
 	"net/http"
+	"testing"
 	"util/think"
 	"util/thinkJson"
 	"util/thinkLog"
 )
+
+func TestSendPost(t *testing.T) {
+	url := "http://www.baidu.com"
+	SendGet(url, nil)
+
+	paramsMap := map[string]interface{}{
+		"type":   "news",
+		"offset": 0,
+		"count":  20,
+	}
+
+	SendPost(url, nil, thinkJson.MustMarshal(paramsMap))
+}
 
 func ExampleSendGet() {
 	url := "http://www.baidu.com"
