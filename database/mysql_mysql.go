@@ -107,7 +107,7 @@ func GetDDL(tableName string) string {
 	return rows[0]["Create Table"]
 }
 
-func sqlString() {
+func sqlStringRemark() {
 	str := make([]string, 0)
 	str = append(str, "SHOW GLOBAL VARIABLES")
 	str = append(str, "SET GLOBAL max_allowed_packet = 4*1024*1024")

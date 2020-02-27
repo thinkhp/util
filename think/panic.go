@@ -12,6 +12,11 @@ import (
 //		panic(err)
 //	}
 //}
+func Panic(err error) {
+	if err != nil {
+		panic(err)
+	}
+}
 
 func IsNil(err error) {
 	if err != nil {

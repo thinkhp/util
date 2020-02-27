@@ -80,13 +80,6 @@ func OpenFile(filePath string, fileName string, flag int) *os.File {
 	return file
 }
 
-func ReadFile(fileFullName string) *os.File {
-	file, err := os.OpenFile(fileFullName, os.O_RDONLY, 0766)
-	think.IsNil(err)
-
-	return file
-}
-
 func CreatePath(path string) {
 	// 如果不存在,则创建目录
 	_, err := os.Stat(path)
@@ -114,7 +107,35 @@ func GetAbsPathWith(basePath string) string {
 	}
 }
 
-// 遍历当前目录下的文件
+func LS(dir string) ([]string ,error){
+	f, err := os.Open(dir)
+	if err != nil {
+		return nil, err
+	}
+	info, err := f.Stat()
+	if err != nil {
+		return nil, err
+	}
+	if !info.IsDir() {
+		return []string{info.Name()}, nil
+	}
+	infos, err := f.Readdir(-1)
+	if err != nil {
+		return nil, err
+	}
+
+	return getNameFromInfo(infos), nil
+}
+
+func getNameFromInfo(infos []os.FileInfo) []string {
+	names := make([]string, 0)
+	for _, info := range infos {
+		names = append(names, info.Name())
+	}
+	return names
+}
+
+// find ./path -name '*.suffix'
 func ListFile(path string, suffix string) []string {
 	allFile := make([]string, 0)
 	filePath := GetAbsPathWith(path)
@@ -141,11 +162,34 @@ func CopyFile(dst, src string) error {
 		return err
 	}
 	defer file.Close()
+
 	fileNew, err := os.OpenFile(dst, os.O_CREATE|os.O_TRUNC|os.O_WRONLY, 0660)
 	if err != nil {
 		return err
 	}
 	defer fileNew.Close()
+
 	_, err = io.Copy(fileNew, file)
 	return err
+}
+
+func ReadLargeFile(fileName string, cacheSize int, ft func(bs []byte)) error{
+	f, err := os.Open(fileName)
+	if err != nil {
+		return err
+	}
+	defer f.Close()
+
+	for {
+		bs := make([]byte, cacheSize)
+		n, err := f.Read(bs)
+		if err != nil {
+			if err == io.EOF {
+				break
+			}
+			return err
+		}
+		ft(bs[:n])
+	}
+	return nil
 }

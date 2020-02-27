@@ -2,10 +2,25 @@ package thinkFile
 
 import (
 	"fmt"
+	"io/ioutil"
 	"os"
 	"strconv"
 	"testing"
 )
+
+func TestLS(t *testing.T) {
+	name := "./"
+	fmt.Println(LS(name))
+}
+func TestReadLargeFile(t *testing.T){
+	name := "./file_util.go"
+	bs, _ := ioutil.ReadFile(name)
+	fmt.Println(len(bs))
+	fmt.Println(ReadLargeFile(name, 1024, func(bs []byte) {
+		fmt.Println(len(bs), bs, string(bs))
+	}))
+
+}
 
 func TestFilePerm(t *testing.T) {
 	fmt.Println(os.ModeDir, os.ModePerm)

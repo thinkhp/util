@@ -10,3 +10,4 @@
 /.idea/*
 *.orgi
 fmt.sh
+.DS_Store

@@ -154,7 +154,7 @@ func InsertBatchStruct(tx *sql.Tx, tableName string, notNilMapList *[]map[string
 // !!!重要提示:
 // *sql.Rows 未关闭
 func Select(tx *sql.Tx, sqlString string, args ...interface{}) *sql.Rows {
-	thinkLog.DebugLog.PrintSQL(sqlString, args)
+	thinkLog.DebugLog.Println(thinkLog.FormatSQL(sqlString, args))
 	var rows *sql.Rows
 	var err error
 	if tx == nil {
