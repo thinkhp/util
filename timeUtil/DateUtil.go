@@ -5,6 +5,45 @@ import (
 	"util/think"
 )
 
+type ExTime struct {
+	time.Time
+}
+
+func (e ExTime)MonthLastDate() time.Time {
+	switch e.Month() {
+	case 1,3,5,7,9,11:
+		return time.Date(e.Year(), e.Month(), 31, 0, 0,0, 0, e.Location())
+	case 4,6,8,10,12:
+		return time.Date(e.Year(), e.Month(), 31, 0, 0,0, 0, e.Location())
+	default:
+		t := time.Date(e.Year(), e.Month(), 28, 0, 0,0, 0, e.Location())
+		if t.AddDate(0,0,1).Month() != 2 {
+			return t.AddDate(0, 0, 1)
+		} else {
+			return t
+		}
+	}
+}
+
+func (e ExTime)MonthDays() int {
+	switch e.Month() {
+	case 1,3,5,7,9,11:
+		return 31
+	case 4,6,8,10,12:
+		return 30
+	default:
+		return e.MonthLastDate().Day()
+	}
+}
+
+func (e ExTime)Date() time.Time {
+	return time.Date(e.Year(), e.Month(), e.Day(), 0, 0, 0, 0, e.Location())
+}
+
+func (e ExTime)YesterdayDate() time.Time {
+	return ExTime{e.AddDate(0, 0, -1)}.Date()
+}
+
 // 方法命名规范:
 // Date 	   		日期 			time.Time
 // DateString		日期字符串 		string:yyyy-mm-dd
@@ -49,6 +88,7 @@ func getDate(now time.Time, i int) time.Time {
 	return time.Unix((now.Unix()/oneDay+int64(i))*oneDay, 0)
 }
 func GetYesterday(now time.Time) time.Time {
+	return ExTime{now}.YesterdayDate()
 	return GetDate(now, -1)
 }
 
